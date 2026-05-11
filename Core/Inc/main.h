@@ -57,6 +57,14 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define UART4_485_LEFT_RX_Pin GPIO_PIN_11
+#define UART4_485_LEFT_RX_GPIO_Port GPIOC
+#define UART2_485_RIGHT_DIR_Pin GPIO_PIN_12
+#define UART2_485_RIGHT_DIR_GPIO_Port GPIOC
+#define UART4_485_LEFT_DIR_Pin GPIO_PIN_14
+#define UART4_485_LEFT_DIR_GPIO_Port GPIOC
+#define UART3_485_DISPLAY_DIR_Pin GPIO_PIN_3
+#define UART3_485_DISPLAY_DIR_GPIO_Port GPIOC
 #define PRESS_INTAKE_IN0_Pin GPIO_PIN_0
 #define PRESS_INTAKE_IN0_GPIO_Port GPIOA
 #define CURRENT_2_IN1_Pin GPIO_PIN_1
@@ -71,6 +79,10 @@ void Error_Handler(void);
 #define TEMP_DEF_IN6_GPIO_Port GPIOA
 #define TEMP_INTAKE_IN7_Pin GPIO_PIN_7
 #define TEMP_INTAKE_IN7_GPIO_Port GPIOA
+#define UART3_485_DISPLAY_TX_Pin GPIO_PIN_4
+#define UART3_485_DISPLAY_TX_GPIO_Port GPIOC
+#define UART3_485_DISPLAY_RX_Pin GPIO_PIN_5
+#define UART3_485_DISPLAY_RX_GPIO_Port GPIOC
 #define TEMP_EXHAUST_IN9_Pin GPIO_PIN_1
 #define TEMP_EXHAUST_IN9_GPIO_Port GPIOB
 #define TEMP_CONDEN_IN10_Pin GPIO_PIN_2
@@ -83,8 +95,14 @@ void Error_Handler(void);
 #define PRESS_EXHAUST_IN16_GPIO_Port GPIOB
 #define COMPRESSOR_Pin GPIO_PIN_3
 #define COMPRESSOR_GPIO_Port GPIOD
+#define UART2_485_RIGHT_TX_Pin GPIO_PIN_5
+#define UART2_485_RIGHT_TX_GPIO_Port GPIOD
+#define UART2_485_RIGHT_RX_Pin GPIO_PIN_6
+#define UART2_485_RIGHT_RX_GPIO_Port GPIOD
 #define ALARM_Pin GPIO_PIN_3
 #define ALARM_GPIO_Port GPIOB
+#define UART4_485_LEFT_TX_Pin GPIO_PIN_10
+#define UART4_485_LEFT_TX_GPIO_Port GPIOC
 
 /* USER CODE BEGIN Private defines */
 
