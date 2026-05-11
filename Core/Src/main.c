@@ -20,16 +20,14 @@
 #include "main.h"
 #include "adc.h"
 #include "dma.h"
+#include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "FreeRTOS.h"
-#include "stm32g0xx_hal_adc.h"
 #include "task.h"
 #include "../../APP/include/compressor.h"
-#include "../../APP/include/alarm.h"
-#include <stdint.h>
 #include "adc_app.h"
 /* USER CODE END Includes */
 
@@ -96,6 +94,9 @@ int main(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_ADC1_Init();
+  MX_USART2_UART_Init();
+  MX_USART3_UART_Init();
+  MX_USART4_UART_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
