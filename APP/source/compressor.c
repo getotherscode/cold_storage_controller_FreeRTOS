@@ -24,6 +24,7 @@ void compressor_ctrl(uint8_t cps_state)
 
 void compressor_main(void *pvParameters)
 {
+    (void) pvParameters;
     for(;;)
     {
         TOGGLE_COMPRESSORS_STATE();
