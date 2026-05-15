@@ -27,7 +27,7 @@
 /* USER CODE BEGIN Includes */
 #include "FreeRTOS.h"
 #include "task.h"
-#include "../../APP/include/compressor.h"
+#include "compressor.h"
 #include "adc_app.h"
 #include "uart_app.h"
 /* USER CODE END Includes */

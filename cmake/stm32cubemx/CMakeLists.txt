@@ -20,7 +20,7 @@ target_include_directories(stm32cubemx INTERFACE
     ../../Drivers/CMSIS/Include
     ../../FreeRTOS-Kernel-G0/include
     ../../FreeRTOS-Kernel-G0/portable/GCC/ARM_CM0
-    ../../APP/include
+    ../../APP/Inc
 )
 
 target_sources(stm32cubemx INTERFACE
@@ -62,10 +62,16 @@ target_sources(stm32cubemx INTERFACE
     ../../FreeRTOS-Kernel-G0/portable/MemMang/heap_4.c
     ../../FreeRTOS-Kernel-G0/portable/GCC/ARM_CM0/portasm.c
     ../../startup_stm32g070xx.s
-    ../../APP/source/compressor.c
-    ../../APP/source/alarm.c
-    ../../APP/source/adc_app.c
-    ../../APP/source/uart_app.c
+    ../../APP/Src/compressor.c
+    ../../APP/Src/alarm.c
+    ../../APP/Src/adc_app.c
+    ../../APP/Src/uart_app.c
+    ../../APP/Src/log.c
+)
+
+target_compile_options(stm32cubemx INTERFACE
+    -mcpu=cortex-m0plus
+    -mthumb
 )
 
 target_link_directories(stm32cubemx INTERFACE
@@ -75,6 +81,8 @@ target_link_libraries(stm32cubemx INTERFACE
 )
 
 target_link_options(stm32cubemx INTERFACE
+    -mcpu=cortex-m0plus
+    -mthumb
     -Wl,--no-warn-rwx-segments
 )
 

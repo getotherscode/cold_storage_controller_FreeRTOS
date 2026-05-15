@@ -1,11 +1,18 @@
 #include "uart_app.h"
 #include "projdefs.h"
+#include "stm32g0xx_hal_uart.h"
 #include "usart.h"
 #include "portmacro.h"
+
+#include <string.h>
 
 static UART_RX_ST uart2_rx_st;
 static UART_RX_ST uart3_rx_st;
 static UART_RX_ST uart4_rx_st;
+
+static UART_TX_ST uart2_tx_st;
+static UART_TX_ST uart3_tx_st;
+static UART_TX_ST uart4_tx_st;
 
 TaskHandle_t* get_uart_task_handle_ptr(uint8_t uart_idth)
 {
@@ -41,6 +48,15 @@ void uart_idel_it_callback(UART_HandleTypeDef *huart)
     }
 
     portYIELD_FROM_ISR(woken);
+}
+
+void uart4_send(uint8_t* buffer, uint16_t len)
+{
+    memcpy(uart4_tx_st.send_buffer, buffer, len);
+
+    SET_UART4_TX();
+    HAL_UART_Transmit(&huart4, uart4_tx_st.send_buffer, len, 1000);
+    SET_UART4_RX();
 }
 
 void uart2_recv_tasks(void *pvParameters)

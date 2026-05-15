@@ -1,6 +1,6 @@
 #include "main.h"
 #include "stm32g0xx_hal_gpio.h"
-#include "../include/compressor.h"
+#include "compressor.h"
 #include <stdint.h>
 
 #include "FreeRTOS.h"
