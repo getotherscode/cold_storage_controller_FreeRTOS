@@ -5,7 +5,7 @@
 #include "stm32g0xx_hal_adc.h"
 #include "stdbool.h"
 
-TaskHandle_t adcTaskHandle = NULL;
+TaskHandle_t adc_task_handle = NULL;
 
 static SAMPLE_BUFFER_ST sample_buffer_st;
 static ADC_DATA_BUFFER_ST adc_data_st;

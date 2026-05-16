@@ -20,17 +20,16 @@
 #include "main.h"
 #include "adc.h"
 #include "dma.h"
+#include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "FreeRTOS.h"
-#include "stm32g0xx_hal_adc.h"
 #include "task.h"
-#include "../../APP/include/compressor.h"
-#include "../../APP/include/alarm.h"
-#include <stdint.h>
+#include "compressor.h"
 #include "adc_app.h"
+#include "uart_app.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -82,6 +81,7 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
+  uart_init();
 
   /* USER CODE END Init */
 
@@ -96,14 +96,21 @@ int main(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_ADC1_Init();
+  MX_USART2_UART_Init();
+  MX_USART3_UART_Init();
+  MX_USART4_UART_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  xTaskCreate(compressor_main, "compressor main function", 128, NULL, 1, NULL);
-  xTaskCreate(adc_task, "ADC", 256, NULL, 1, &adcTaskHandle);
+  xTaskCreate(compressor_main, "COMPRESS MAIN", 128, NULL, 1, NULL);
+  xTaskCreate(adc_task, "ADC MAIN", 256, NULL, 1, &adc_task_handle);
+  xTaskCreate(uart2_recv_tasks, "UART2 RX", 256, NULL, 2, get_uart_task_handle_ptr(RIGHT));
+  xTaskCreate(uart3_recv_tasks, "UART3 RX", 256, NULL, 2, get_uart_task_handle_ptr(DISPLAY));
+  xTaskCreate(uart4_recv_tasks, "UART4 RX", 256, NULL, 2, get_uart_task_handle_ptr(LEFT));
+  
   vTaskStartScheduler();
   while (1)
   {

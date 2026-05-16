@@ -19,5 +19,5 @@ void alarm_ctrl(uint8_t state)
 
 void alarm_main(void *pvParameters)
 {
-
+    (void) pvParameters;
 }

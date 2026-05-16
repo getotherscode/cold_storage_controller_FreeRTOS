@@ -91,4 +91,4 @@ typedef struct
 
 void adc_task(void* pvParameters);
 
-extern TaskHandle_t adcTaskHandle;
+extern TaskHandle_t adc_task_handle;

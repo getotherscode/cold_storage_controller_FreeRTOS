@@ -1,6 +1,6 @@
 #include "main.h"
 #include "stm32g0xx_hal_gpio.h"
-#include "../include/compressor.h"
+#include "compressor.h"
 #include <stdint.h>
 
 #include "FreeRTOS.h"
@@ -24,6 +24,7 @@ void compressor_ctrl(uint8_t cps_state)
 
 void compressor_main(void *pvParameters)
 {
+    (void) pvParameters;
     for(;;)
     {
         TOGGLE_COMPRESSORS_STATE();

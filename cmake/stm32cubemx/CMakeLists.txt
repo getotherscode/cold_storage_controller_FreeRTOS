@@ -20,7 +20,7 @@ target_include_directories(stm32cubemx INTERFACE
     ../../Drivers/CMSIS/Include
     ../../FreeRTOS-Kernel-G0/include
     ../../FreeRTOS-Kernel-G0/portable/GCC/ARM_CM0
-    ../../APP/include
+    ../../APP/Inc
 )
 
 target_sources(stm32cubemx INTERFACE
@@ -28,19 +28,18 @@ target_sources(stm32cubemx INTERFACE
     ../../Core/Src/gpio.c
     ../../Core/Src/adc.c
     ../../Core/Src/dma.c
+    ../../Core/Src/usart.c
     ../../Core/Src/stm32g0xx_it.c
     ../../Core/Src/stm32g0xx_hal_msp.c
     ../../Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_tim.c
     ../../Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_tim_ex.c
     ../../Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_rcc.c
     ../../Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_rcc_ex.c
-    ../../Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_ll_rcc.c
     ../../Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_flash.c
     ../../Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_flash_ex.c
     ../../Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_gpio.c
     ../../Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_dma.c
     ../../Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_dma_ex.c
-    ../../Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_ll_dma.c
     ../../Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_pwr.c
     ../../Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_pwr_ex.c
     ../../Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_cortex.c
@@ -48,7 +47,8 @@ target_sources(stm32cubemx INTERFACE
     ../../Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_exti.c
     ../../Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_adc.c
     ../../Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_adc_ex.c
-    ../../Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_ll_adc.c
+    ../../Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_uart.c
+    ../../Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_uart_ex.c
     ../../Core/Src/system_stm32g0xx.c
     ../../Core/Src/sysmem.c
     ../../Core/Src/syscalls.c
@@ -62,15 +62,28 @@ target_sources(stm32cubemx INTERFACE
     ../../FreeRTOS-Kernel-G0/portable/MemMang/heap_4.c
     ../../FreeRTOS-Kernel-G0/portable/GCC/ARM_CM0/portasm.c
     ../../startup_stm32g070xx.s
-    ../../APP/source/compressor.c
-    ../../APP/source/alarm.c
-    ../../APP/source/adc_app.c
+    ../../APP/Src/compressor.c
+    ../../APP/Src/alarm.c
+    ../../APP/Src/adc_app.c
+    ../../APP/Src/uart_app.c
+    ../../APP/Src/log.c
+)
+
+target_compile_options(stm32cubemx INTERFACE
+    -mcpu=cortex-m0plus
+    -mthumb
 )
 
 target_link_directories(stm32cubemx INTERFACE
 )
 
 target_link_libraries(stm32cubemx INTERFACE
+)
+
+target_link_options(stm32cubemx INTERFACE
+    -mcpu=cortex-m0plus
+    -mthumb
+    -Wl,--no-warn-rwx-segments
 )
 
 # Validate that STM32CubeMX code is compatible with C standard
