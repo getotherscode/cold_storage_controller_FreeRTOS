@@ -16,7 +16,7 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
     (void) hadc;
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
     //if adcTaskHandle has high priority, xHigherPriorityTaskWoken is true
-    vTaskNotifyGiveFromISR(adcTaskHandle, &xHigherPriorityTaskWoken);
+    vTaskNotifyGiveFromISR(adc_task_handle, &xHigherPriorityTaskWoken);
     //let scheduler switch to high priority task
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
