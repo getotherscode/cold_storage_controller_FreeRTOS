@@ -17,7 +17,7 @@ static const int16_t TEMP_MAX = 125;
 // NTC ADC-T Table From deepseek convert the R-T table
 // R_fixed = 10kΩ，ADC 12位 (0~4095)，B=3380，25℃=10kΩ
 // range：-50℃ ~ 125℃
-const uint16_t adc_table[TABLE_SIZE] = 
+static const uint16_t adc_table[TABLE_SIZE] = 
 {
     3987, 3980, 3973, 3965, 3956, 3949, 3939, 3931, // -50℃ ~ -43℃
     3922, 3912, 3901, 3891, 3879, 3868, 3855, 3843, // -42℃ ~ -35℃
