@@ -18,9 +18,6 @@ target_include_directories(stm32cubemx INTERFACE
     ../../Drivers/STM32G0xx_HAL_Driver/Inc/Legacy
     ../../Drivers/CMSIS/Device/ST/STM32G0xx/Include
     ../../Drivers/CMSIS/Include
-    ../../FreeRTOS-Kernel-G0/include
-    ../../FreeRTOS-Kernel-G0/portable/GCC/ARM_CM0
-    ../../APP/Inc
 )
 
 target_sources(stm32cubemx INTERFACE
@@ -52,21 +49,7 @@ target_sources(stm32cubemx INTERFACE
     ../../Core/Src/system_stm32g0xx.c
     ../../Core/Src/sysmem.c
     ../../Core/Src/syscalls.c
-    ../../FreeRTOS-Kernel-G0/tasks.c
-    ../../FreeRTOS-Kernel-G0/queue.c
-    ../../FreeRTOS-Kernel-G0/list.c
-    ../../FreeRTOS-Kernel-G0/timers.c
-    ../../FreeRTOS-Kernel-G0/event_groups.c
-    ../../FreeRTOS-Kernel-G0/stream_buffer.c
-    ../../FreeRTOS-Kernel-G0/portable/GCC/ARM_CM0/port.c
-    ../../FreeRTOS-Kernel-G0/portable/MemMang/heap_4.c
-    ../../FreeRTOS-Kernel-G0/portable/GCC/ARM_CM0/portasm.c
     ../../startup_stm32g070xx.s
-    ../../APP/Src/compressor.c
-    ../../APP/Src/alarm.c
-    ../../APP/Src/adc_app.c
-    ../../APP/Src/uart_app.c
-    ../../APP/Src/log.c
 )
 
 target_compile_options(stm32cubemx INTERFACE
@@ -74,10 +57,16 @@ target_compile_options(stm32cubemx INTERFACE
     -mthumb
 )
 
+target_include_directories(stm32cubemx INTERFACE
+    ${FREERTOS_INC}
+    ${APP_INC}
+)
+
 target_link_directories(stm32cubemx INTERFACE
 )
 
 target_link_libraries(stm32cubemx INTERFACE
+    freertos
 )
 
 target_link_options(stm32cubemx INTERFACE

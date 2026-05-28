@@ -2,7 +2,20 @@
 Refrigeration control system firmware based on STM32 and FreeRTOS, featuring EEV control, VFD compressor management, condenser fan control and RS485 communication.
 
 ## build
-
+--- CSCF
+ |---app(write)
+ |    |---CMakeLists
+ |---cmake(auto generate by cubemx)
+ |    |---CMakeLists(Core,Drivers)
+ |    |---arm-eabi-none-gcc.cmake
+ |---Core
+ |---Drivers
+ |---FreeRTOS(write)
+ |    |---CMakeLists
+ |---lib(write)
+ |    |---CMakeLists
+ |---test(write)
+      |---CMakeLists
 ### software
 1>CMake
 2>Ninja

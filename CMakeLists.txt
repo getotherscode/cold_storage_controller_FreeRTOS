@@ -24,6 +24,9 @@ set(CMAKE_PROJECT_NAME cold-storage-controller)
 # Include toolchain file
 include("cmake/gcc-arm-none-eabi.cmake")
 
+# Chip type
+add_compile_definitions(STM32G070xx)
+
 # Enable compile command to ease indexing with e.g. clangd
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
@@ -37,8 +40,22 @@ message("Build type: " ${CMAKE_BUILD_TYPE})
 # Create an executable object type
 add_executable(${CMAKE_PROJECT_NAME})
 
+# Inc
+set(FREERTOS_INC ${CMAKE_SOURCE_DIR}/FreeRTOS-Kernel-G0/include)
+set(APP_INC ${CMAKE_SOURCE_DIR}/app/inc)
+set(CORE_INC ${CMAKE_SOURCE_DIR}/Core/Inc)
+#stm32g0xx.h
+set(DEVICE_INC ${CMAKE_SOURCE_DIR}/Drivers/CMSIS/Device/ST/STM32G0xx/Include) 
+set(FREERTOS_ARM_INC ${CMAKE_SOURCE_DIR}/FreeRTOS-Kernel-G0/portable/GCC/ARM_CM0)
+#core_cm0plus.h
+set(CMSIS_INC ${CMAKE_SOURCE_DIR}/Drivers/CMSIS/Include)
+set(HAL_INC ${CMAKE_SOURCE_DIR}/Drivers/STM32G0xx_HAL_Driver/Inc)
+
 # Add STM32CubeMX generated sources
 add_subdirectory(cmake/stm32cubemx)
+add_subdirectory(app)
+add_subdirectory(lib)
+add_subdirectory(FreeRTOS-Kernel-G0)
 
 # Link directories setup
 target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
@@ -63,8 +80,8 @@ target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
 # Add linked libraries
 target_link_libraries(${CMAKE_PROJECT_NAME}
     stm32cubemx
-
-    # Add user defined libraries
+    app
+    lib
 )
 
 add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
