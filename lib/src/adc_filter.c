@@ -54,3 +54,4 @@ uint16_t mean_topk(uint16_t* buffer, uint16_t trim_num)
     average = sum / (SAMPLE_BUFFER_NUM - trim_num * 2);
     return average;
 }
+
