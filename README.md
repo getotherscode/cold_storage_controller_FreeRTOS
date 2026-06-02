@@ -22,9 +22,9 @@ Refrigeration control system firmware based on STM32 and FreeRTOS, featuring EEV
 3>arm-none-ebai-gcc
 
 ### cmd
-1>cd build
-2>cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug ..
-3>ninja
+--- in root dir CLI---
+1> cmake --preset Debug 
+2> ninja -C build/Debug
 
 ## download and Debug
 
@@ -33,7 +33,8 @@ xopenocd
 
 ### hardware
 WCH DAP-Link, not specified tool, you can use whichever ones you like
+Drivers: https://www.wch.cn/downloads/WCH-LinkUtility_ZIP.html
 
 ### download cmd
 openocd -f interface/cmsis-dap.cfg -f target/stm32g0x.cfg \
-        -c "program D:/GitProject/cold-storage-controller/build/cold-storage-controller.hex verify reset exit"
+        -c "program D:/EmbendedProject/cold_storage_controller_FreeRTOS/build/Debug/cold-storage-controller.hex verify reset exit"
