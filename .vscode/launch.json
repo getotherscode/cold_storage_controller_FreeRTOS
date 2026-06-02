@@ -7,7 +7,7 @@
             "gdbPath": "arm-none-eabi-gdb",
             "request": "launch",
             "cwd": "${workspaceFolder}",
-            "executable": "${workspaceFolder}/build/cold-storage-controller.elf",
+            "executable": "${workspaceFolder}/build/Debug/cold-storage-controller.elf",
             "servertype": "openocd",
             "configFiles": [
                 "interface/cmsis-dap.cfg",
