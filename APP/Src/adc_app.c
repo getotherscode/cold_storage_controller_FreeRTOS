@@ -5,6 +5,8 @@
 #include "stm32g0xx_hal_adc.h"
 #include "stdbool.h"
 #include "adc_filter.h"
+#include <stdint.h>
+#include "log.h"
 
 TaskHandle_t adc_task_handle = NULL;
 
@@ -79,18 +81,44 @@ static void adc_filter_task(void)
 //2. if you have R-T table, better. you can get ADC-T table by R-T table through 
 //   ADC = (R_ntc / (R_ntc + R_fixed)) * ADC_max, R_ntc in R-T table, R_fixed = 10k
 //   ADC_MAX = 2^12 = 4096
-static void scale_transformation_temperture(void)
+static int16_t scale_transformation_temperature_10x(uint16_t adc_index)
 {
+    uint16_t adc_temp = adc_data_st.adc_buffer[adc_index];
+
+    //boarder check
+    bool beyond_upper_limit = (adc_temp > ntc_rt_table_3380[0]);
+    bool beyond_lower_limit = (adc_temp < ntc_rt_table_3380[NTC_TABLE_SIZE - 1]);
+    if(beyond_lower_limit || beyond_upper_limit)
+    {
+        return TEMP_SENSOR_FAILURE_VALUE;
+    }
+
+    //binary search
+    uint16_t left = 0;
+    uint16_t right = NTC_TABLE_SIZE - 1;
+    while(left + 1 < right)
+    {
+        uint16_t middle = left + (right - left) / 2;
+        if (adc_temp > ntc_rt_table_3380[middle]) 
+            right = middle;
+        else 
+            left = middle; 
+    }
     
+    int16_t temp_base = TEMP_MIN_10X + (int16_t)left * 10;
+    int16_t adc_delta = adc_temp - ntc_rt_table_3380[left];
+    int16_t adc_range = ntc_rt_table_3380[right] - ntc_rt_table_3380[left];
 
+    int16_t temp = temp_base + ((adc_delta * 10) / adc_range);
+    return temp;
 }
 
-static void scale_transformation_pressure()
+static void scale_transformation_pressure(void)
 {
 
 }
 
-static void scale_transformation_current()
+static void scale_transformation_current(void)
 {
 
 }
@@ -110,14 +138,15 @@ void adc_task(void* pvParameters)
         //if take the sigle, pdTRUE -> pdFALSE
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
+        //finish sampling
         if(adc_sample_task())
         {
             //filter
             adc_filter_task();
             
-            //scale transformation: origin sample data -> human readable
-            scale_transformation_temperture();
+            //scale transformation: origin sample data -> prorcessed
+            adc_data_st.adc_processed_data_10x[ADC_IDX_TEMP_STORAGE] = scale_transformation_temperature_10x(ADC_IDX_TEMP_STORAGE);
+            LOG_DEBUG("%d", adc_data_st.adc_processed_data_10x[ADC_IDX_TEMP_STORAGE]);
         }
-        
     }
 }
