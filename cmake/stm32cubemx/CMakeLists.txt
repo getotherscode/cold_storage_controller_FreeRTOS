@@ -49,7 +49,7 @@ target_sources(stm32cubemx INTERFACE
     ../../Core/Src/system_stm32g0xx.c
     ../../Core/Src/sysmem.c
     ../../Core/Src/syscalls.c
-    ../../startup_stm32g070xx.s
+    ../../Drivers/CMSIS/Device/ST/STM32G0xx/Source/Templates/gcc/startup_stm32g070xx.s
 )
 
 target_compile_options(stm32cubemx INTERFACE
