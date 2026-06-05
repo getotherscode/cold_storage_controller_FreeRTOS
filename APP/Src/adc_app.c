@@ -209,11 +209,21 @@ static int16_t scale_transformation_temperature_10x(uint16_t adc_index, uint8_t 
     return temp;
 }
 
+// Vref = 5V
+// Vadc = adc / 4096 * Vref
+// Vmin, Vrange, Prange is in Pressure sensor data sheet
+// P = (Vadc - Vmin) / Vrange * Prange
 static void scale_transformation_pressure(void)
 {
 
 }
 
+// N: tuns ratio is in data sheet
+// V(adc_peak) = adc_max / 4096 * Vref
+// 0.7V is voltage decrease by diode，is physical propety
+// V(sample-r-peak) = V(adc_peak) + 0.7V
+// I = V(sample-r-peak) / R(sample)
+// Irms = I * 1/√2
 static void scale_transformation_current(void)
 {
 
@@ -241,6 +251,8 @@ void adc_task(void* pvParameters)
             adc_filter_task();
             
             //scale transformation: origin sample data -> prorcessed
+            
+            //temperature
             adc_data_st.adc_processed_data_10x[ADC_IDX_TEMP_STORAGE] = scale_transformation_temperature_10x(ADC_IDX_TEMP_STORAGE, B_VALUE_3380);
             adc_data_st.adc_processed_data_10x[ADC_IDX_TEMP_DEF] = scale_transformation_temperature_10x(ADC_IDX_TEMP_DEF, B_VALUE_3380);
             adc_data_st.adc_processed_data_10x[ADC_IDX_TEMP_INTAKE] = scale_transformation_temperature_10x(ADC_IDX_TEMP_INTAKE, B_VALUE_3435);
