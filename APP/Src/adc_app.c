@@ -158,6 +158,66 @@ static void adc_filter_task(void)
     adc_data_st.adc_buffer[ADC_IDX_TEMP_SPRAY] = mean_middle(sample_buffer_st.temp_spray,TRIM_NUMBER);
 }
 
+static void adc_sensor_error_handler(uint16_t adc_index)
+{
+    uint16_t num_rstc = 32;
+    char err_desc[num_rstc];
+    sniprintf(err_desc, num_rstc, "SENSOR FLASE :");
+
+    switch (adc_index) 
+    {
+        case ADC_IDX_PRESS_INTAKE:
+            sniprintf(err_desc, num_rstc, " P-INTAKE");
+            break;
+
+        case ADC_IDX_CURRENT_2:
+            sniprintf(err_desc, num_rstc, " CURRENT 2");
+            break;
+
+        case ADC_IDX_CURRENT_1:
+            sniprintf(err_desc, num_rstc, " CURRENT 1");
+            break;
+
+        case ADC_IDX_CURRENT_3:
+            sniprintf(err_desc, num_rstc, " CURRENT 3");
+            break;
+
+        case ADC_IDX_TEMP_STORAGE:
+            sniprintf(err_desc, num_rstc, " STORAGE");
+            break;
+
+        case ADC_IDX_TEMP_DEF:
+            sniprintf(err_desc, num_rstc, " DEF");
+            break;
+
+        case ADC_IDX_TEMP_INTAKE:
+            sniprintf(err_desc, num_rstc, " T-INTAKE");
+            break;
+
+        case ADC_IDX_TEMP_EXHAUST:
+            sniprintf(err_desc, num_rstc, " T-EXHAUST");
+            break;
+
+        case ADC_IDX_TEMP_CONDEN:
+            sniprintf(err_desc, num_rstc, " CONDEN");
+            break;
+
+        case ADC_IDX_TEMP_AMBIENT:
+            sniprintf(err_desc, num_rstc, " AMBIENT");
+            break;
+
+        case ADC_IDX_TEMP_SPRAY:
+            sniprintf(err_desc, num_rstc, " SPRAY");
+            break;
+
+        case ADC_IDX_PRESS_EXHAUST:
+            sniprintf(err_desc, num_rstc, " P-EXHAUST");
+            break;
+    }
+
+    LOG_ERROR("%s",err_desc);
+}
+
 //convertion: Steinhart-Hart Formula, 1/T = A + B * ln(R) + C * (ln(R))^3
 //B-value bigger means NTC is sensitive to temperature change
 //1. if do not have ntc manual, get A,B,C by 3 groups equations
