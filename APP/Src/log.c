@@ -12,7 +12,7 @@
 
 #define LOG_LEVEL LOG_LEVEL_DEBUG
 
-#define LOG_BUF_SIZE      128
+#define LOG_BUF_SIZE      256
 #define LOG_STREAM_SIZE   1024
 #define LOG_TASK_STACK    256
 #define LOG_TASK_PRIO     1
