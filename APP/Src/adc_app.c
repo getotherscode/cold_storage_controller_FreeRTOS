@@ -13,6 +13,9 @@ TaskHandle_t adc_task_handle = NULL;
 static SAMPLE_BUFFER_ST sample_buffer_st;
 static ADC_DATA_BUFFER_ST adc_data_st;
 
+static const int16_t TEMP_MIN_10X = -500;
+static const int16_t ADC_NULL = 0;
+
 // NTC ADC-T Table From deepseek convert the R-T table
 // R_fixed = 10kΩ，ADC 12位 (0~4095)，25℃=10kΩ
 // range：-50℃ ~ 125℃

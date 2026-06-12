@@ -11,11 +11,6 @@
 #define TRIM_NUMBER       15
 #define NTC_TABLE_SIZE    176
 
-static const int16_t TEMP_MIN_10X = -500;
-static const int16_t TEMP_MAX_10x = 1250;
-
-static const int16_t TEMP_SENSOR_FAILURE_VALUE = INT16_MIN;
-
 typedef enum
 {
     B_VALUE_3380 = 0,
