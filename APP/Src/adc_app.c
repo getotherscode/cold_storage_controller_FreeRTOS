@@ -6,6 +6,7 @@
 #include "stdbool.h"
 #include "adc_filter.h"
 #include <stdint.h>
+#include <stdio.h>
 #include "log.h"
 
 TaskHandle_t adc_task_handle = NULL;
@@ -244,12 +245,13 @@ static int16_t scale_transformation_temperature_10x(uint16_t adc_index, uint8_t 
         return 0;
     }
 
-    //boarder check
+    //boarder check by ADC-T table
     bool beyond_upper_limit = (adc_temp > adc_temp_table[0]);
     bool beyond_lower_limit = (adc_temp < adc_temp_table[NTC_TABLE_SIZE - 1]);
     if(beyond_lower_limit || beyond_upper_limit)
     {
-        return TEMP_SENSOR_FAILURE_VALUE;
+        adc_sensor_error_handler(adc_index);
+        return ADC_NULL;
     }
 
     //binary search
@@ -272,22 +274,65 @@ static int16_t scale_transformation_temperature_10x(uint16_t adc_index, uint8_t 
     return temp;
 }
 
+// specification and module : Low (0.5-4.5dc | 0-2Mpa), High (0.5-4.5dc | 0-4.6Mpa)
 // Vref = 5V
 // Vadc = adc / 4096 * Vref
 // Vmin, Vrange, Prange is in Pressure sensor data sheet
 // P = (Vadc - Vmin) / Vrange * Prange
-static void scale_transformation_pressure(void)
+static uint16_t scale_transformation_pressure_100x(uint16_t adc_index)
 {
+    uint16_t adc_press = adc_data_st.adc_buffer[adc_index];
+    //100x
+    uint16_t adc_v = (adc_press * 100) / 4096 * 5;
+    
+    uint8_t beyond_lower_limit = (adc_v < 50);
+    uint8_t beyond_upper_limit = (adc_v > 450);
+    if(beyond_lower_limit || beyond_upper_limit)
+    {
+        adc_sensor_error_handler(adc_index);
+        return ADC_NULL;
+    }
+    
+    // 4.5 - 0.5 = 4
+    uint16_t dc_range = 4;
+    // 1bar = 0.1Mpa
+    uint16_t press_range = 0;
 
+    if(adc_index == ADC_IDX_PRESS_EXHAUST)
+    {
+        press_range = 46;
+    }
+    else if(adc_index == ADC_IDX_PRESS_INTAKE)
+    {
+        press_range = 20;
+    }
+
+    uint16_t press = (adc_v - 50) / dc_range * press_range;
+    return press;
 }
 
-// N: tuns ratio is in data sheet
+// specification and module : ZHT102W(5A/2.5mA) ZHT350C(5A/2.5mA)
+// N: 2000:1, Vref = 3.3v, R(sample) = 100Ω， 0.7V is voltage decrease by diode，is physical propety
 // V(adc_peak) = adc_max / 4096 * Vref
-// 0.7V is voltage decrease by diode，is physical propety
 // V(sample-r-peak) = V(adc_peak) + 0.7V
 // I = V(sample-r-peak) / R(sample)
 // Irms = I * 1/√2
-static void scale_transformation_current(void)
+static uint16_t scale_transformation_current_100x(uint16_t adc_index)
+{
+    uint16_t adc_max = adc_data_st.adc_buffer[adc_index];
+    uint16_t N = 2000;
+
+    //330 = Vref * 100;
+    uint16_t adc_peak = adc_max / 4096 * 330;
+    //70 = 0.7 * 100
+    uint16_t phy_real_peak = adc_peak + 70;
+    uint16_t cur_peak = phy_real_peak / 100;
+    uint16_t rms = cur_peak * 1000 / 1414 * N;
+
+    return rms;
+}
+
+static void adc_threshold_alarm_handler(void)
 {
 
 }
@@ -295,6 +340,7 @@ static void scale_transformation_current(void)
 void adc_task(void* pvParameters)
 {
     (void) pvParameters;
+    UBaseType_t uxHighWaterMark;
     TickType_t xLastWakeTime = xTaskGetTickCount();
     const TickType_t xPeriod = pdMS_TO_TICKS(1);  // 1ms
     for(;;)
@@ -316,20 +362,36 @@ void adc_task(void* pvParameters)
             //scale transformation: origin sample data -> prorcessed
             
             //temperature
-            adc_data_st.adc_processed_data_10x[ADC_IDX_TEMP_STORAGE] = scale_transformation_temperature_10x(ADC_IDX_TEMP_STORAGE, B_VALUE_3380);
-            adc_data_st.adc_processed_data_10x[ADC_IDX_TEMP_DEF] = scale_transformation_temperature_10x(ADC_IDX_TEMP_DEF, B_VALUE_3380);
-            adc_data_st.adc_processed_data_10x[ADC_IDX_TEMP_INTAKE] = scale_transformation_temperature_10x(ADC_IDX_TEMP_INTAKE, B_VALUE_3435);
-            adc_data_st.adc_processed_data_10x[ADC_IDX_TEMP_EXHAUST] = scale_transformation_temperature_10x(ADC_IDX_TEMP_EXHAUST, B_VALUE_3435);
-            adc_data_st.adc_processed_data_10x[ADC_IDX_TEMP_CONDEN] = scale_transformation_temperature_10x(ADC_IDX_TEMP_CONDEN, B_VALUE_3950);
-            adc_data_st.adc_processed_data_10x[ADC_IDX_TEMP_AMBIENT] = scale_transformation_temperature_10x(ADC_IDX_TEMP_AMBIENT, B_VALUE_3950);
-            adc_data_st.adc_processed_data_10x[ADC_IDX_TEMP_SPRAY] = scale_transformation_temperature_10x(ADC_IDX_TEMP_SPRAY, B_VALUE_3435);
+            adc_data_st.adc_processed_data[ADC_IDX_TEMP_STORAGE] = scale_transformation_temperature_10x(ADC_IDX_TEMP_STORAGE, B_VALUE_3380);
+            adc_data_st.adc_processed_data[ADC_IDX_TEMP_DEF] = scale_transformation_temperature_10x(ADC_IDX_TEMP_DEF, B_VALUE_3380);
+            adc_data_st.adc_processed_data[ADC_IDX_TEMP_INTAKE] = scale_transformation_temperature_10x(ADC_IDX_TEMP_INTAKE, B_VALUE_3435);
+            adc_data_st.adc_processed_data[ADC_IDX_TEMP_EXHAUST] = scale_transformation_temperature_10x(ADC_IDX_TEMP_EXHAUST, B_VALUE_3435);
+            adc_data_st.adc_processed_data[ADC_IDX_TEMP_CONDEN] = scale_transformation_temperature_10x(ADC_IDX_TEMP_CONDEN, B_VALUE_3950);
+            adc_data_st.adc_processed_data[ADC_IDX_TEMP_AMBIENT] = scale_transformation_temperature_10x(ADC_IDX_TEMP_AMBIENT, B_VALUE_3950);
+            adc_data_st.adc_processed_data[ADC_IDX_TEMP_SPRAY] = scale_transformation_temperature_10x(ADC_IDX_TEMP_SPRAY, B_VALUE_3435);
+
+            //pressure
+            adc_data_st.adc_processed_data[ADC_IDX_PRESS_INTAKE] = scale_transformation_pressure_100x(ADC_IDX_PRESS_INTAKE);
+            adc_data_st.adc_processed_data[ADC_IDX_PRESS_EXHAUST] = scale_transformation_pressure_100x(ADC_IDX_PRESS_EXHAUST);
+
+            //current
+            adc_data_st.adc_processed_data[ADC_IDX_CURRENT_1] = scale_transformation_current_100x(ADC_IDX_CURRENT_1);
+            adc_data_st.adc_processed_data[ADC_IDX_CURRENT_2] = scale_transformation_current_100x(ADC_IDX_CURRENT_2);
+            adc_data_st.adc_processed_data[ADC_IDX_CURRENT_3] = scale_transformation_current_100x(ADC_IDX_CURRENT_3);
 
             //print all temperature sensor value
-            LOG_DEBUG("%d,%d,%d,%d,%d,%d,%d", 
-                    adc_data_st.adc_processed_data_10x[ADC_IDX_TEMP_STORAGE], adc_data_st.adc_processed_data_10x[ADC_IDX_TEMP_DEF],
-                    adc_data_st.adc_processed_data_10x[ADC_IDX_TEMP_INTAKE], adc_data_st.adc_processed_data_10x[ADC_IDX_TEMP_EXHAUST],
-                    adc_data_st.adc_processed_data_10x[ADC_IDX_TEMP_CONDEN], adc_data_st.adc_processed_data_10x[ADC_IDX_TEMP_AMBIENT],
-                    adc_data_st.adc_processed_data_10x[ADC_IDX_TEMP_SPRAY]);
+            LOG_DEBUG("TEMP STORAGE =%d, DEF =%d, INTAKE =%d, EXHAUST =%d, CONDEN =%d, AMBIENT =%d, SPARY =%d PRESS INTAKE =%d, EXHAUST =%d CURRENT C1 =%d, C2 =%d, C3 =%d",
+                    adc_data_st.adc_processed_data[ADC_IDX_TEMP_STORAGE], adc_data_st.adc_processed_data[ADC_IDX_TEMP_DEF],
+                    adc_data_st.adc_processed_data[ADC_IDX_TEMP_INTAKE], adc_data_st.adc_processed_data[ADC_IDX_TEMP_EXHAUST],
+                    adc_data_st.adc_processed_data[ADC_IDX_TEMP_CONDEN], adc_data_st.adc_processed_data[ADC_IDX_TEMP_AMBIENT],
+                    adc_data_st.adc_processed_data[ADC_IDX_TEMP_SPRAY],
+                    adc_data_st.adc_processed_data[ADC_IDX_PRESS_INTAKE], adc_data_st.adc_processed_data[ADC_IDX_PRESS_EXHAUST],
+                    adc_data_st.adc_processed_data[ADC_IDX_CURRENT_1], adc_data_st.adc_processed_data[ADC_IDX_CURRENT_2],
+                    adc_data_st.adc_processed_data[ADC_IDX_CURRENT_3]);
+
+            //test the deepest stack used condition
+            uxHighWaterMark = uxTaskGetStackHighWaterMark(NULL);
+            LOG_INFO("the deepeset is %lu", uxHighWaterMark);
         }
     }
-}   
+}
