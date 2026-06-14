@@ -1,12 +1,16 @@
-#Drivers
+# Drivers
 Drivers/*
 
-#build
+# build
 build/*
 
-#cache
+# cache
 .cache/*
 
-#config for different workbench
+# config for different workbench
 .vscode/settings.json
 compile_commands.json
+
+# test folder
+test/unity
+test/*.exe
