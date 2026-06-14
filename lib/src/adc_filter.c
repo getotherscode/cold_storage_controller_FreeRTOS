@@ -1,5 +1,4 @@
 #include "adc_filter.h"
-#include "adc_app.h"
 
 
 void insertion_sort(uint16_t *buffer, int n)
@@ -21,37 +20,37 @@ void insertion_sort(uint16_t *buffer, int n)
 }
 
 //temperature and pressure type data filter algrithom
-uint16_t mean_middle(uint16_t* buffer, uint16_t trim_num)
+uint16_t mean_middle(uint16_t* buffer, uint16_t data_num, uint16_t trim_num)
 {
 
-    insertion_sort(buffer, SAMPLE_BUFFER_NUM);
+    insertion_sort(buffer, data_num);
 
     //trim at both sides and get the average
     uint32_t sum = 0;
     uint16_t average;
-    for(int i = trim_num; i < SAMPLE_BUFFER_NUM - trim_num; i++)
+    for(int i = trim_num; i < data_num - trim_num; i++)
     {
         sum += buffer[i];
     }
 
-    average = sum / (SAMPLE_BUFFER_NUM - trim_num * 2);
+    average = sum / (data_num - trim_num * 2);
     return average;
 }
 
 //current type data algrithom
-uint16_t mean_topk(uint16_t* buffer, uint16_t trim_num)
+uint16_t mean_topk(uint16_t* buffer, uint16_t data_num, uint16_t trim_num)
 {
-    insertion_sort(buffer, SAMPLE_BUFFER_NUM);
+    insertion_sort(buffer, data_num);
 
     //trim at both sides and get the average
     uint32_t sum = 0;
     uint16_t average;
-    for(int i = trim_num * 2; i < SAMPLE_BUFFER_NUM; i++)
+    for(int i = trim_num * 2; i < data_num; i++)
     {
         sum += buffer[i];
     }
 
-    average = sum / (SAMPLE_BUFFER_NUM - trim_num * 2);
+    average = sum / (data_num - trim_num * 2);
     return average;
 }
 

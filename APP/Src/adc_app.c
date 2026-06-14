@@ -143,20 +143,20 @@ static bool adc_sample_task(void)
 static void adc_filter_task(void)
 {
     //sample task is ready, sort and get the median number five times and do average calculation
-    adc_data_st.adc_buffer[ADC_IDX_PRESS_INTAKE] = mean_middle(sample_buffer_st.press_intake,TRIM_NUMBER);
-    adc_data_st.adc_buffer[ADC_IDX_PRESS_EXHAUST] = mean_middle(sample_buffer_st.press_exhaust,TRIM_NUMBER);
+    adc_data_st.adc_buffer[ADC_IDX_PRESS_INTAKE] = mean_middle(sample_buffer_st.press_intake, SAMPLE_BUFFER_NUM, TRIM_NUMBER);
+    adc_data_st.adc_buffer[ADC_IDX_PRESS_EXHAUST] = mean_middle(sample_buffer_st.press_exhaust,SAMPLE_BUFFER_NUM, TRIM_NUMBER);
 
-    adc_data_st.adc_buffer[ADC_IDX_CURRENT_1] = mean_topk(sample_buffer_st.current_1,TRIM_NUMBER);
-    adc_data_st.adc_buffer[ADC_IDX_CURRENT_2] = mean_topk(sample_buffer_st.current_2,TRIM_NUMBER);
-    adc_data_st.adc_buffer[ADC_IDX_CURRENT_3] = mean_topk(sample_buffer_st.current_3,TRIM_NUMBER);
+    adc_data_st.adc_buffer[ADC_IDX_CURRENT_1] = mean_topk(sample_buffer_st.current_1,SAMPLE_BUFFER_NUM, TRIM_NUMBER);
+    adc_data_st.adc_buffer[ADC_IDX_CURRENT_2] = mean_topk(sample_buffer_st.current_2,SAMPLE_BUFFER_NUM, TRIM_NUMBER);
+    adc_data_st.adc_buffer[ADC_IDX_CURRENT_3] = mean_topk(sample_buffer_st.current_3,SAMPLE_BUFFER_NUM, TRIM_NUMBER);
 
-    adc_data_st.adc_buffer[ADC_IDX_TEMP_STORAGE] = mean_middle(sample_buffer_st.temp_storage,TRIM_NUMBER);
-    adc_data_st.adc_buffer[ADC_IDX_TEMP_DEF] = mean_middle(sample_buffer_st.temp_defrost,TRIM_NUMBER);
-    adc_data_st.adc_buffer[ADC_IDX_TEMP_INTAKE] = mean_middle(sample_buffer_st.temp_intake,TRIM_NUMBER);
-    adc_data_st.adc_buffer[ADC_IDX_TEMP_EXHAUST] = mean_middle(sample_buffer_st.temp_exhaust,TRIM_NUMBER);
-    adc_data_st.adc_buffer[ADC_IDX_TEMP_CONDEN] = mean_middle(sample_buffer_st.temp_condensing,TRIM_NUMBER);
-    adc_data_st.adc_buffer[ADC_IDX_TEMP_AMBIENT] = mean_middle(sample_buffer_st.temp_ambient,TRIM_NUMBER);
-    adc_data_st.adc_buffer[ADC_IDX_TEMP_SPRAY] = mean_middle(sample_buffer_st.temp_spray,TRIM_NUMBER);
+    adc_data_st.adc_buffer[ADC_IDX_TEMP_STORAGE] = mean_middle(sample_buffer_st.temp_storage,SAMPLE_BUFFER_NUM, TRIM_NUMBER);
+    adc_data_st.adc_buffer[ADC_IDX_TEMP_DEF] = mean_middle(sample_buffer_st.temp_defrost,SAMPLE_BUFFER_NUM, TRIM_NUMBER);
+    adc_data_st.adc_buffer[ADC_IDX_TEMP_INTAKE] = mean_middle(sample_buffer_st.temp_intake,SAMPLE_BUFFER_NUM, TRIM_NUMBER);
+    adc_data_st.adc_buffer[ADC_IDX_TEMP_EXHAUST] = mean_middle(sample_buffer_st.temp_exhaust,SAMPLE_BUFFER_NUM, TRIM_NUMBER);
+    adc_data_st.adc_buffer[ADC_IDX_TEMP_CONDEN] = mean_middle(sample_buffer_st.temp_condensing,SAMPLE_BUFFER_NUM, TRIM_NUMBER);
+    adc_data_st.adc_buffer[ADC_IDX_TEMP_AMBIENT] = mean_middle(sample_buffer_st.temp_ambient,SAMPLE_BUFFER_NUM, TRIM_NUMBER);
+    adc_data_st.adc_buffer[ADC_IDX_TEMP_SPRAY] = mean_middle(sample_buffer_st.temp_spray,SAMPLE_BUFFER_NUM, TRIM_NUMBER);
 }
 
 static void adc_sensor_error_handler(uint16_t adc_index)
@@ -334,7 +334,7 @@ static uint16_t scale_transformation_current_100x(uint16_t adc_index)
 
 static void adc_threshold_alarm_handler(void)
 {
-
+    
 }
 
 void adc_task(void* pvParameters)
