@@ -7,8 +7,8 @@
 
 //adc sample channel and filter
 #define ADC_CHANNEL_NUM   12
-#define SAMPLE_BUFFER_NUM 40
 #define TRIM_NUMBER       15
+#define SAMPLE_BUFFER_NUM 40  // SAMPLE_BUFFER_NUM > TRIM_NUMBER * 2
 #define NTC_TABLE_SIZE    176
 
 typedef enum

@@ -24,6 +24,12 @@ uint16_t mean_middle(uint16_t* buffer, uint16_t data_num, uint16_t trim_num)
 {
 
     insertion_sort(buffer, data_num);
+	
+	//data_num > trim_num * 2
+	if(data_num <= trim_num* 2)
+	{
+		return 0;
+	}
 
     //trim at both sides and get the average
     uint32_t sum = 0;
@@ -41,6 +47,12 @@ uint16_t mean_middle(uint16_t* buffer, uint16_t data_num, uint16_t trim_num)
 uint16_t mean_topk(uint16_t* buffer, uint16_t data_num, uint16_t trim_num)
 {
     insertion_sort(buffer, data_num);
+	
+	//data_num > trim_num * 2
+	if(data_num <= trim_num* 2)
+	{
+		return 0;
+	}
 
     //trim at both sides and get the average
     uint32_t sum = 0;
