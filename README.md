@@ -38,3 +38,14 @@ Drivers: https://www.wch.cn/downloads/WCH-LinkUtility_ZIP.html
 ### download cmd
 openocd -f interface/cmsis-dap.cfg -f target/stm32g0x.cfg \
         -c "program D:/EmbendedProject/cold_storage_controller_FreeRTOS/build/Debug/cold-storage-controller.hex verify reset exit"
+
+## test
+
+### unity test
+1> where: https://www.throwtheswitch.org/unity#unity-get-section
+2> clone: git clone https://github.com/ThrowTheSwitch/Unity.git
+3> needed files: 1)unity.c 2)unity.h 3) unity_internals.h
+4> where to put: test/unity 
+5> verify test: in test folder, type "make", execute "test_main.exe"
+
+### mock test
