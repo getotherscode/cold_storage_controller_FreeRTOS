@@ -12,7 +12,7 @@ CFLAGS += $(INCLUDES)
 
 # src files
 SRCS = test_main.c
-SRCS += test_adc_filter.c
+SRCS += lib/test_adc_filter.c
 SRCS += ../lib/src/adc_filter.c
 SRCS += unity/unity.c
 
