@@ -159,73 +159,12 @@ static void adc_filter_task(void)
     adc_data_st.adc_buffer[ADC_IDX_TEMP_SPRAY] = mean_middle(sample_buffer_st.temp_spray,SAMPLE_BUFFER_NUM, TRIM_NUMBER);
 }
 
-static void adc_sensor_error_handler(uint16_t adc_index)
-{
-    uint16_t num_rstc = 32;
-    char err_desc[num_rstc];
-    sniprintf(err_desc, num_rstc, "SENSOR FLASE :");
-
-    switch (adc_index) 
-    {
-        case ADC_IDX_PRESS_INTAKE:
-            sniprintf(err_desc, num_rstc, " P-INTAKE");
-            break;
-
-        case ADC_IDX_CURRENT_2:
-            sniprintf(err_desc, num_rstc, " CURRENT 2");
-            break;
-
-        case ADC_IDX_CURRENT_1:
-            sniprintf(err_desc, num_rstc, " CURRENT 1");
-            break;
-
-        case ADC_IDX_CURRENT_3:
-            sniprintf(err_desc, num_rstc, " CURRENT 3");
-            break;
-
-        case ADC_IDX_TEMP_STORAGE:
-            sniprintf(err_desc, num_rstc, " STORAGE");
-            break;
-
-        case ADC_IDX_TEMP_DEF:
-            sniprintf(err_desc, num_rstc, " DEF");
-            break;
-
-        case ADC_IDX_TEMP_INTAKE:
-            sniprintf(err_desc, num_rstc, " T-INTAKE");
-            break;
-
-        case ADC_IDX_TEMP_EXHAUST:
-            sniprintf(err_desc, num_rstc, " T-EXHAUST");
-            break;
-
-        case ADC_IDX_TEMP_CONDEN:
-            sniprintf(err_desc, num_rstc, " CONDEN");
-            break;
-
-        case ADC_IDX_TEMP_AMBIENT:
-            sniprintf(err_desc, num_rstc, " AMBIENT");
-            break;
-
-        case ADC_IDX_TEMP_SPRAY:
-            sniprintf(err_desc, num_rstc, " SPRAY");
-            break;
-
-        case ADC_IDX_PRESS_EXHAUST:
-            sniprintf(err_desc, num_rstc, " P-EXHAUST");
-            break;
-    }
-
-    LOG_ERROR("%s",err_desc);
-}
-
 //convertion: Steinhart-Hart Formula, 1/T = A + B * ln(R) + C * (ln(R))^3
 //B-value bigger means NTC is sensitive to temperature change
 //1. if do not have ntc manual, get A,B,C by 3 groups equations
 //2. if you have R-T table, better. you can get ADC-T table by R-T table through 
-static int16_t scale_transformation_temperature_10x(uint16_t adc_index, uint8_t b_value)
+static int16_t scale_transformation_temperature_10x(uint16_t adc_raw, uint8_t b_value, const char* caller_name)
 {
-    uint16_t adc_temp = adc_data_st.adc_buffer[adc_index];
     const uint16_t* adc_temp_table = {0}; 
 
     if(b_value == B_VALUE_3380)
@@ -246,11 +185,11 @@ static int16_t scale_transformation_temperature_10x(uint16_t adc_index, uint8_t 
     }
 
     //boarder check by ADC-T table
-    bool beyond_upper_limit = (adc_temp > adc_temp_table[0]);
-    bool beyond_lower_limit = (adc_temp < adc_temp_table[NTC_TABLE_SIZE - 1]);
+    bool beyond_upper_limit = (adc_raw > adc_temp_table[0]);
+    bool beyond_lower_limit = (adc_raw < adc_temp_table[NTC_TABLE_SIZE - 1]);
     if(beyond_lower_limit || beyond_upper_limit)
     {
-        adc_sensor_error_handler(adc_index);
+        LOG_ERROR("%s temperature adc raw is out of range", caller_name);
         return ADC_NULL;
     }
 
@@ -260,14 +199,14 @@ static int16_t scale_transformation_temperature_10x(uint16_t adc_index, uint8_t 
     while(left + 1 < right)
     {
         uint16_t middle = left + (right - left) / 2;
-        if (adc_temp > adc_temp_table[middle]) 
+        if (adc_raw > adc_temp_table[middle]) 
             right = middle;
         else 
             left = middle; 
     }
     
     int16_t temp_base = TEMP_MIN_10X + (int16_t)left * 10;
-    int16_t adc_delta = adc_temp - adc_temp_table[left];
+    int16_t adc_delta = adc_raw - adc_temp_table[left];
     int16_t adc_range = adc_temp_table[right] - adc_temp_table[left];
 
     int16_t temp = temp_base + ((adc_delta * 10) / adc_range);
@@ -279,34 +218,22 @@ static int16_t scale_transformation_temperature_10x(uint16_t adc_index, uint8_t 
 // Vadc = adc / 4096 * Vref
 // Vmin, Vrange, Prange is in Pressure sensor data sheet
 // P = (Vadc - Vmin) / Vrange * Prange
-static uint16_t scale_transformation_pressure_100x(uint16_t adc_index)
+// 1bar = 0.1Mpa
+static uint16_t scale_transformation_pressure_100x(uint16_t adc_raw, const uint16_t press_range, const char* caller_name)
 {
-    uint16_t adc_press = adc_data_st.adc_buffer[adc_index];
     //100x
-    uint16_t adc_v = (adc_press * 100) / 4096 * 5;
+    uint16_t adc_v = (adc_raw * 100) / 4096 * 5;
     
     uint8_t beyond_lower_limit = (adc_v < 50);
     uint8_t beyond_upper_limit = (adc_v > 450);
     if(beyond_lower_limit || beyond_upper_limit)
     {
-        adc_sensor_error_handler(adc_index);
+        LOG_ERROR("%s pressure adc raw is out of range", caller_name);
         return ADC_NULL;
     }
     
     // 4.5 - 0.5 = 4
     uint16_t dc_range = 4;
-    // 1bar = 0.1Mpa
-    uint16_t press_range = 0;
-
-    if(adc_index == ADC_IDX_PRESS_EXHAUST)
-    {
-        press_range = 46;
-    }
-    else if(adc_index == ADC_IDX_PRESS_INTAKE)
-    {
-        press_range = 20;
-    }
-
     uint16_t press = (adc_v - 50) / dc_range * press_range;
     return press;
 }
@@ -317,24 +244,18 @@ static uint16_t scale_transformation_pressure_100x(uint16_t adc_index)
 // V(sample-r-peak) = V(adc_peak) + 0.7V
 // I = V(sample-r-peak) / R(sample)
 // Irms = I * 1/√2
-static uint16_t scale_transformation_current_100x(uint16_t adc_index)
+static uint16_t scale_transformation_current_100x(uint16_t adc_raw)
 {
-    uint16_t adc_max = adc_data_st.adc_buffer[adc_index];
     uint16_t N = 2000;
 
     //330 = Vref * 100;
-    uint16_t adc_peak = adc_max / 4096 * 330;
+    uint16_t adc_peak = adc_raw / 4096 * 330;
     //70 = 0.7 * 100
     uint16_t phy_real_peak = adc_peak + 70;
     uint16_t cur_peak = phy_real_peak / 100;
     uint16_t rms = cur_peak * 1000 / 1414 * N;
 
     return rms;
-}
-
-static void adc_threshold_alarm_handler(void)
-{
-    
 }
 
 void adc_task(void* pvParameters)
@@ -362,22 +283,22 @@ void adc_task(void* pvParameters)
             //scale transformation: origin sample data -> prorcessed
             
             //temperature
-            adc_data_st.adc_processed_data[ADC_IDX_TEMP_STORAGE] = scale_transformation_temperature_10x(ADC_IDX_TEMP_STORAGE, B_VALUE_3380);
-            adc_data_st.adc_processed_data[ADC_IDX_TEMP_DEF] = scale_transformation_temperature_10x(ADC_IDX_TEMP_DEF, B_VALUE_3380);
-            adc_data_st.adc_processed_data[ADC_IDX_TEMP_INTAKE] = scale_transformation_temperature_10x(ADC_IDX_TEMP_INTAKE, B_VALUE_3435);
-            adc_data_st.adc_processed_data[ADC_IDX_TEMP_EXHAUST] = scale_transformation_temperature_10x(ADC_IDX_TEMP_EXHAUST, B_VALUE_3435);
-            adc_data_st.adc_processed_data[ADC_IDX_TEMP_CONDEN] = scale_transformation_temperature_10x(ADC_IDX_TEMP_CONDEN, B_VALUE_3950);
-            adc_data_st.adc_processed_data[ADC_IDX_TEMP_AMBIENT] = scale_transformation_temperature_10x(ADC_IDX_TEMP_AMBIENT, B_VALUE_3950);
-            adc_data_st.adc_processed_data[ADC_IDX_TEMP_SPRAY] = scale_transformation_temperature_10x(ADC_IDX_TEMP_SPRAY, B_VALUE_3435);
+            adc_data_st.adc_processed_data[ADC_IDX_TEMP_STORAGE] = scale_transformation_temperature_10x(adc_data_st.adc_buffer[ADC_IDX_TEMP_STORAGE], B_VALUE_3380, "storage");
+            adc_data_st.adc_processed_data[ADC_IDX_TEMP_DEF] = scale_transformation_temperature_10x(adc_data_st.adc_buffer[ADC_IDX_TEMP_DEF],B_VALUE_3380,"def");
+            adc_data_st.adc_processed_data[ADC_IDX_TEMP_INTAKE] = scale_transformation_temperature_10x(adc_data_st.adc_buffer[ADC_IDX_TEMP_INTAKE], B_VALUE_3435,"intake");
+            adc_data_st.adc_processed_data[ADC_IDX_TEMP_EXHAUST] = scale_transformation_temperature_10x(adc_data_st.adc_buffer[ADC_IDX_TEMP_EXHAUST],B_VALUE_3435,"exhaust");
+            adc_data_st.adc_processed_data[ADC_IDX_TEMP_CONDEN] = scale_transformation_temperature_10x(adc_data_st.adc_buffer[ADC_IDX_TEMP_CONDEN],B_VALUE_3950,"condense");
+            adc_data_st.adc_processed_data[ADC_IDX_TEMP_AMBIENT] = scale_transformation_temperature_10x(adc_data_st.adc_buffer[ADC_IDX_TEMP_AMBIENT],B_VALUE_3950,"ambient");
+            adc_data_st.adc_processed_data[ADC_IDX_TEMP_SPRAY] = scale_transformation_temperature_10x(adc_data_st.adc_buffer[ADC_IDX_TEMP_SPRAY], B_VALUE_3435,"spary");
 
             //pressure
-            adc_data_st.adc_processed_data[ADC_IDX_PRESS_INTAKE] = scale_transformation_pressure_100x(ADC_IDX_PRESS_INTAKE);
-            adc_data_st.adc_processed_data[ADC_IDX_PRESS_EXHAUST] = scale_transformation_pressure_100x(ADC_IDX_PRESS_EXHAUST);
+            adc_data_st.adc_processed_data[ADC_IDX_PRESS_INTAKE] = scale_transformation_pressure_100x(adc_data_st.adc_buffer[ADC_IDX_PRESS_INTAKE],46,"intake");
+            adc_data_st.adc_processed_data[ADC_IDX_PRESS_EXHAUST] = scale_transformation_pressure_100x(adc_data_st.adc_buffer[ADC_IDX_PRESS_EXHAUST],20,"exhaust");
 
             //current
-            adc_data_st.adc_processed_data[ADC_IDX_CURRENT_1] = scale_transformation_current_100x(ADC_IDX_CURRENT_1);
-            adc_data_st.adc_processed_data[ADC_IDX_CURRENT_2] = scale_transformation_current_100x(ADC_IDX_CURRENT_2);
-            adc_data_st.adc_processed_data[ADC_IDX_CURRENT_3] = scale_transformation_current_100x(ADC_IDX_CURRENT_3);
+            adc_data_st.adc_processed_data[ADC_IDX_CURRENT_1] = scale_transformation_current_100x(adc_data_st.adc_buffer[ADC_IDX_CURRENT_1]);
+            adc_data_st.adc_processed_data[ADC_IDX_CURRENT_2] = scale_transformation_current_100x(adc_data_st.adc_buffer[ADC_IDX_CURRENT_2]);
+            adc_data_st.adc_processed_data[ADC_IDX_CURRENT_3] = scale_transformation_current_100x(adc_data_st.adc_buffer[ADC_IDX_CURRENT_3]);
 
             //print all temperature sensor value
             LOG_DEBUG("TEMP STORAGE =%d, DEF =%d, INTAKE =%d, EXHAUST =%d, CONDEN =%d, AMBIENT =%d, SPARY =%d PRESS INTAKE =%d, EXHAUST =%d CURRENT C1 =%d, C2 =%d, C3 =%d",
