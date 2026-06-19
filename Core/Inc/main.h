@@ -101,6 +101,10 @@ void Error_Handler(void);
 #define UART2_485_RIGHT_RX_GPIO_Port GPIOD
 #define ALARM_Pin GPIO_PIN_3
 #define ALARM_GPIO_Port GPIOB
+#define EEP_SDA_Pin GPIO_PIN_8
+#define EEP_SDA_GPIO_Port GPIOB
+#define EEP_SCL_Pin GPIO_PIN_9
+#define EEP_SCL_GPIO_Port GPIOB
 #define UART4_485_LEFT_TX_Pin GPIO_PIN_10
 #define UART4_485_LEFT_TX_GPIO_Port GPIOC
 
