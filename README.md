@@ -16,15 +16,21 @@ Refrigeration control system firmware based on STM32 and FreeRTOS, featuring EEV
  |    |---CMakeLists  
  |---test(write)  
       |---CMakeLists  
+
 ### software
 1>CMake  
 2>Ninja  
 3>arm-none-ebai-gcc  
 
 ### cmd
---- in root dir CLI---  
+
+#### debug
 1> cmake --preset Debug  
 2> ninja -C build/Debug  
+
+#### release
+1> cmake --preset Release  
+2> ninja -C build/Release  
 
 ## download and Debug
 
@@ -32,11 +38,12 @@ Refrigeration control system firmware based on STM32 and FreeRTOS, featuring EEV
 xopenocd  
 
 ### hardware
-WCH DAP-Link, not specified tool, you can use whichever ones you like  
-Drivers: https://www.wch.cn/downloads/WCH-LinkUtility_ZIP.html  
+WCH DAP-Link: not specified tool, you can use whichever ones you like  
+drivers download link: https://www.wch.cn/downloads/WCH-LinkUtility_ZIP.html  
 
 ### download cmd
-openocd -f interface/cmsis-dap.cfg -f target/stm32g0x.cfg  
+openocd -f interface/cmsis-dap.cfg\  
+        -f target/stm32g0x.cfg\  
         -c "program D:/EmbendedProject/cold_storage_controller_FreeRTOS/build/Debug/cold-storage-controller.hex verify reset exit"
 
 ## test
@@ -49,3 +56,11 @@ openocd -f interface/cmsis-dap.cfg -f target/stm32g0x.cfg
 5> verify test: in test folder, type "make", execute "test_main.exe"  
 
 ### mock test
+
+## references
+
+### I2C 
+UM10204 — I2C-bus specification and user manual
+
+## EEP-CHIP 
+https://item.szlcsc.com/82297.html?fromZone=s_s__%252224c04%2522&spm=sc.gbn.xh1.zy.n___sc.hm.hst.2&lcsc_vid=E1hXA1cEFlheBAACEVENVgcDRlkLU1UFRlYMUQBeQAUxVlNeRVVZVlVVT1leUjtW
