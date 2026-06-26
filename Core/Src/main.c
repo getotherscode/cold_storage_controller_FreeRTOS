@@ -32,6 +32,7 @@
 #include "adc_app.h"
 #include "uart_app.h"
 #include "log.h"
+#include "timer.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -104,6 +105,7 @@ int main(void)
   MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
   log_init();
+  tim6_init();
   /* USER CODE END 2 */
 
   /* Infinite loop */
