@@ -6,6 +6,9 @@ add_library(app STATIC
     src/compressor.c
     src/log.c
     src/uart_app.c
+    src/i2c.c
+    src/eep.c
+    src/timer.c
 )
 ## add target library target
 target_sources(app PRIVATE
