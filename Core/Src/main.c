@@ -32,6 +32,7 @@
 #include "adc_app.h"
 #include "uart_app.h"
 #include "log.h"
+#include "eep.h"
 #include "timer.h"
 /* USER CODE END Includes */
 
@@ -111,8 +112,11 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
-  //deepest stack 252, 312 is safe
-  xTaskCreate(adc_task, "ADC MAIN",312, NULL, 1, &adc_task_handle);
+  // adc task, deepest stack 252, 312 is safe
+  //xTaskCreate(adc_task, "ADC MAIN",312, NULL, 1, &adc_task_handle);
+
+  // eep task
+  xTaskCreate(eep_one_byte_test, "EEP MAIN",256, NULL, 1, NULL);
   
   vTaskStartScheduler();
   while (1)
