@@ -21,6 +21,10 @@
             "svdFile": "STM32G070.svd",
             "swoConfig": {
                 "enabled": false
+            },
+            "liveWatch": {
+                "enabled": true,
+                "samplesPerSecond": 2
             }
         }
     ]
