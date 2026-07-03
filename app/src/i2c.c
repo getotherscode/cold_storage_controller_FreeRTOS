@@ -34,7 +34,7 @@ static inline void sda_high_with_delay() {sda_high(); i2c_delay();}
 
 static inline void sda_low_with_delay() {sda_low(); i2c_delay();}
 
-static inline void set_ack() { scl_high_with_delay(); sda_low_with_delay(); }
+static inline void set_ack() { sda_low_with_delay(); scl_high_with_delay(); scl_low_with_delay(); sda_high();}
 
 void i2c_start()
 {
