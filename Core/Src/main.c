@@ -116,7 +116,7 @@ int main(void)
   //xTaskCreate(adc_task, "ADC MAIN",312, NULL, 1, &adc_task_handle);
 
   // eep task
-  xTaskCreate(eep_one_byte_test, "EEP MAIN",256, NULL, 1, NULL);
+  xTaskCreate(eep_test, "EEP MAIN",256, NULL, 1, NULL);
   
   vTaskStartScheduler();
   while (1)

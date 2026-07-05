@@ -234,39 +234,45 @@ bool eep_read(const uint16_t start_address, uint8_t* buffer, const uint16_t len)
     return true;
 }
 
-
 /*byte read and byte write test*/
 // 1- use oscilloscope verify wave
 // 2- test 100khz and 40khz
-/* void eep_one_byte_test()
+void eep_test()
 {
-    const uint8_t address = 2;
-    uint8_t write_byte = 0xF;
-    uint8_t read_byte = 0;
-
+    uint8_t test_write[16] = {0x01, 0x02, 0x03, 0x04, 0, 0, 0, 0x0A, 0, 0, 0, 0, 0x05, 0x06, 0x07, 0x09};
+    uint8_t test_read[16] = {0};
     TickType_t xLastWakeTime = xTaskGetTickCount();
-    const TickType_t xPeriod = pdMS_TO_TICKS(1000);  // 1ms
+    const TickType_t xPeriod = pdMS_TO_TICKS(5000);  // 5s
 
     for(;;)
     {
         xTaskDelayUntil(&xLastWakeTime, xPeriod);
 
-        if(!eep_write_one_byte(address, write_byte))
-        {
-            LOG_ERROR("write address %d is failed", address);
-        }
+        /* not cross page */
+        //uint16_t start_address = 0;
+        
+        /* cross page */
+        uint16_t start_address = 5;
 
-        vTaskDelay(10);
-
-        if(!eep_random_read_one_byte(address, &read_byte))
+        if(!eep_write(start_address, test_write, sizeof(test_write)))
         {
-            LOG_ERROR("read address %d is failed", address);
+            LOG_ERROR("write is failed\n");
+        } 
+
+        vTaskDelay(100);
+
+        if(!eep_read(start_address, test_read, 16))
+        {
+            LOG_ERROR("read is failed\n");
         }
         else
         {
-            LOG_INFO("read address %d is %d", address, read_byte);
+            for(uint8_t i = 0; i < 16; i++)
+            {
+                LOG_DEBUG("%d", test_read[i]);
+            }
         }
     }
-} */
+}
 
 
