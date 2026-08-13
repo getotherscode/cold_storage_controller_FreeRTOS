@@ -21,6 +21,8 @@
 #include "iwdg.h"
 
 /* USER CODE BEGIN 0 */
+#include "FreeRTOS.h"
+#include "task.h"
 
 /* USER CODE END 0 */
 
@@ -52,5 +54,15 @@ void MX_IWDG_Init(void)
 }
 
 /* USER CODE BEGIN 1 */
+
+void iwdg_task(void* pvParameters)
+{
+  (void)pvParameters;
+  for (;;)
+  {
+      HAL_IWDG_Refresh(&hiwdg);
+      vTaskDelay(pdMS_TO_TICKS(100));
+  }
+}
 
 /* USER CODE END 1 */

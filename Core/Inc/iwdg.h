@@ -42,6 +42,8 @@ void MX_IWDG_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 
+void iwdg_task(void* pvParameters);
+
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus
