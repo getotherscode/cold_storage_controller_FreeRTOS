@@ -69,6 +69,11 @@ openocd -f interface/cmsis-dap.cfg -f target/stm32g0x.cfg\
 
 ### mock test
 
+## crash dump
+
+### locate abnormal code line
+arm-none-eabi-addr2line -e ./build/Debug/cold-storage-controller.elf -f -C ${PC_value}/${LR_value}
+
 ## references
 
 ### I2C 
