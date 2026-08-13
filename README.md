@@ -32,6 +32,19 @@ Refrigeration control system firmware based on STM32 and FreeRTOS, featuring EEV
 1> cmake --preset Release  
 2> ninja -C build/Release  
 
+## FLASH and RAM layout
+
+### FLASH
+1) bootloader 0x08000000-0x08004FFF size: 20K
+2) main app   0x08005000-0x0801D000 size: 104K
+3) crash log  0x0801E000-0x0801E7FF size: 2K
+4) boot mark  0x0801E800-0x0801EFFF size: 2K
+
+### RAM
+1) common ram 0x20000000-0x20008BFF 35K
+2) crash log  0x20000000-0x20009000 1K
+
+
 ## download and Debug
 
 ### software
@@ -42,9 +55,8 @@ WCH DAP-Link: not specified tool, you can use whichever ones you like
 drivers download link: https://www.wch.cn/downloads/WCH-LinkUtility_ZIP.html  
 
 ### download cmd
-openocd -f interface/cmsis-dap.cfg\  
-        -f target/stm32g0x.cfg\  
-        -c "program D:/EmbendedProject/cold_storage_controller_FreeRTOS/build/Debug/cold-storage-controller.hex verify reset exit"
+openocd -f interface/cmsis-dap.cfg -f target/stm32g0x.cfg\    
+        -c "program ./build/Debug/cold-storage-controller.hex verify reset exit"
 
 ## test
 
@@ -62,5 +74,5 @@ openocd -f interface/cmsis-dap.cfg\
 ### I2C 
 UM10204 — I2C-bus specification and user manual
 
-## EEP-CHIP 
+### EEP 
 https://item.szlcsc.com/82297.html?fromZone=s_s__%252224c04%2522&spm=sc.gbn.xh1.zy.n___sc.hm.hst.2&lcsc_vid=E1hXA1cEFlheBAACEVENVgcDRlkLU1UFRlYMUQBeQAUxVlNeRVVZVlVVT1leUjtW
