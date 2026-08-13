@@ -24,4 +24,4 @@ bool eep_write(const uint16_t start_address, uint8_t* buffer, const uint16_t len
 
 bool eep_read(const uint16_t start_address, uint8_t* buffer, const uint16_t len);
 
-void eep_test(void);
+void eep_test(void* pvParameters);

@@ -237,8 +237,9 @@ bool eep_read(const uint16_t start_address, uint8_t* buffer, const uint16_t len)
 /*byte read and byte write test*/
 // 1- use oscilloscope verify wave
 // 2- test 100khz and 40khz
-void eep_test()
+void eep_test(void* pvParameters)
 {
+    (void)pvParameters;
     uint8_t test_write[16] = {0x01, 0x02, 0x03, 0x04, 0, 0, 0, 0x0A, 0, 0, 0, 0, 0x05, 0x06, 0x07, 0x09};
     uint8_t test_read[16] = {0};
     TickType_t xLastWakeTime = xTaskGetTickCount();
