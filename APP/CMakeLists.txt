@@ -9,6 +9,7 @@ add_library(app STATIC
     src/i2c.c
     src/eep.c
     src/timer.c
+    src/crash_dump.c
 )
 ## add target library target
 target_sources(app PRIVATE
