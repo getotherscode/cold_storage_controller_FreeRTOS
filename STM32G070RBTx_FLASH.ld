@@ -61,7 +61,8 @@ _Min_Stack_Size = 0x400; /* required amount of stack */
 /* Specify the memory areas */
 MEMORY
 {
-RAM (xrw)      : ORIGIN = 0x20000000, LENGTH = 36K
+RAM (xrw)      : ORIGIN = 0x20000000, LENGTH = 35K
+CRASH_RAM (xrw) : ORIGIN = 0x20008E00, LENGTH = 1K
 FLASH (rx)      : ORIGIN = 0x8000000, LENGTH = 128K
 }
 
@@ -173,7 +174,15 @@ SECTIONS
     . = ALIGN(8);
   } >RAM
 
-  
+/* put crash log here */
+.crash_ram (NOLOAD) :
+{
+    . = ALIGN(4);
+    __crash_ram_start__ = .;
+    KEEP(*(.crash_ram))
+    . = ALIGN(4);
+    __crash_ram_end__ = .;
+} >RAM
 
   /* Remove information from the standard libraries */
   /DISCARD/ :
