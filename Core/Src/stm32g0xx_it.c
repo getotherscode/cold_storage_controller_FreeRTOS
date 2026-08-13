@@ -23,6 +23,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "uart_app.h"
+#include "crash_dump.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -87,6 +88,8 @@ void NMI_Handler(void)
 /**
   * @brief This function handles Hard fault interrupt.
   */
+//disable function prologue
+__attribute__((naked)) 
 void HardFault_Handler(void)
 {
   /* USER CODE BEGIN HardFault_IRQn 0 */
@@ -95,6 +98,23 @@ void HardFault_Handler(void)
   while (1)
   {
     /* USER CODE BEGIN W1_HardFault_IRQn 0 */
+    //LR bit2 = 0  → use MSP before abnormal: main stack point
+    //LR bit2 = 1  → use PSP before abnormal: process stack point
+    //LR & 4, check if lr bit2 is 1/0
+    //bl brach with link, beq: branch if equal, brach = jump
+    //mrs move from special register
+    __asm volatile
+    (
+        "mov    r1, lr             \n"
+        "movs   r2, #4             \n"
+        "tst    r1, r2             \n"
+        "beq    use_msp            \n"
+        "mrs    r0, psp            \n"
+        "bl     hardfault_hander_c \n"   // b → bl
+        "use_msp:                  \n"
+        "mrs    r0, msp            \n"
+        "bl     hardfault_hander_c \n"   // b → bl
+    );
     /* USER CODE END W1_HardFault_IRQn 0 */
   }
 }
