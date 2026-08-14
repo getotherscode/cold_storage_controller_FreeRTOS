@@ -80,10 +80,18 @@ arm-none-eabi-addr2line -e ./build/Debug/cold-storage-controller.elf -f -C ${PC_
 ### disassembly
 arm-none-eabi-objdump -dS your_project.elf > disasm.txt
 
+## database proxy design
+any data read and write operation should be executed by database proxy safety functions  
+
+## usart duties
+-usart4: output debug info, sample data, runtime data
+-usart2: data read, ota, data write
+
 ## references
 
 ### I2C 
 UM10204 — I2C-bus specification and user manual
 
 ### EEP 
+AT24C04RB  
 https://item.szlcsc.com/82297.html?fromZone=s_s__%252224c04%2522&spm=sc.gbn.xh1.zy.n___sc.hm.hst.2&lcsc_vid=E1hXA1cEFlheBAACEVENVgcDRlkLU1UFRlYMUQBeQAUxVlNeRVVZVlVVT1leUjtW
