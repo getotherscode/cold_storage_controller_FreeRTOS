@@ -86,7 +86,6 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-  uart_init();
 
   /* USER CODE END Init */
 
@@ -105,10 +104,10 @@ int main(void)
   MX_USART3_UART_Init();
   MX_USART4_UART_Init();
   MX_TIM6_Init();
-  MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
   log_init();
   tim6_init();
+  uart_init();
   /* USER CODE END 2 */
 
   /* Infinite loop */
