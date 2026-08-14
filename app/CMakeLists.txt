@@ -3,7 +3,7 @@
 add_library(app STATIC
     src/adc_app.c
     src/alarm.c
-    src/compressor.c
+    src/relay.c
     src/log.c
     src/uart_app.c
     src/i2c.c
