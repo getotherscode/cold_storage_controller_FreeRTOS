@@ -71,8 +71,14 @@ openocd -f interface/cmsis-dap.cfg -f target/stm32g0x.cfg\
 
 ## crash dump
 
+### thirdparty utils
+CMBackTrace
+
 ### locate abnormal code line
 arm-none-eabi-addr2line -e ./build/Debug/cold-storage-controller.elf -f -C ${PC_value}/${LR_value}
+
+### disassembly
+arm-none-eabi-objdump -dS your_project.elf > disasm.txt
 
 ## references
 
