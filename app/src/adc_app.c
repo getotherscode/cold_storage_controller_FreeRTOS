@@ -316,3 +316,13 @@ void adc_task(void* pvParameters)
         }
     }
 }
+
+int32_t* adc_data_take_all(void)
+{
+    return adc_data_st.adc_processed_data;
+}
+
+int32_t adc_data_take_one(uint8_t data_idx)
+{
+    return adc_data_st.adc_processed_data[data_idx];
+}

@@ -61,9 +61,13 @@ typedef struct
 typedef struct
 {
     uint16_t adc_buffer[ADC_CHANNEL_NUM];
-    uint16_t adc_processed_data[ADC_CHANNEL_NUM];
+    int32_t adc_processed_data[ADC_CHANNEL_NUM];
 }ADC_DATA_BUFFER_ST;
+
+extern TaskHandle_t adc_task_handle;
 
 void adc_task(void* pvParameters);
 
-extern TaskHandle_t adc_task_handle;
+int32_t* adc_data_take_all(void);
+
+int32_t adc_data_take_one(uint8_t data_idx);
