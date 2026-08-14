@@ -156,6 +156,7 @@ bool eep_write(const uint16_t start_address, uint8_t* buffer, const uint16_t len
             eep_w_st.cur_buf_index = 0;
             eep_w_st.left_bytes = len;
             eep_w_st.state = EEP_WRITE;
+            eep_w_st.is_busy = true;
         }
         break;
 
@@ -202,6 +203,11 @@ bool eep_write(const uint16_t start_address, uint8_t* buffer, const uint16_t len
     }
 
     return true;
+}
+
+bool is_eep_busy(void)
+{
+    return eep_w_st.is_busy;
 }
 
 bool eep_read(const uint16_t start_address, uint8_t* buffer, const uint16_t len)
