@@ -300,16 +300,6 @@ void adc_task(void* pvParameters)
             adc_data_st.adc_processed_data[ADC_IDX_CURRENT_2] = scale_transformation_current_100x(adc_data_st.adc_buffer[ADC_IDX_CURRENT_2]);
             adc_data_st.adc_processed_data[ADC_IDX_CURRENT_3] = scale_transformation_current_100x(adc_data_st.adc_buffer[ADC_IDX_CURRENT_3]);
 
-            //print all temperature sensor value
-            LOG_DEBUG("TEMP STORAGE =%d, DEF =%d, INTAKE =%d, EXHAUST =%d, CONDEN =%d, AMBIENT =%d, SPARY =%d PRESS INTAKE =%d, EXHAUST =%d CURRENT C1 =%d, C2 =%d, C3 =%d",
-                    adc_data_st.adc_processed_data[ADC_IDX_TEMP_STORAGE], adc_data_st.adc_processed_data[ADC_IDX_TEMP_DEF],
-                    adc_data_st.adc_processed_data[ADC_IDX_TEMP_INTAKE], adc_data_st.adc_processed_data[ADC_IDX_TEMP_EXHAUST],
-                    adc_data_st.adc_processed_data[ADC_IDX_TEMP_CONDEN], adc_data_st.adc_processed_data[ADC_IDX_TEMP_AMBIENT],
-                    adc_data_st.adc_processed_data[ADC_IDX_TEMP_SPRAY],
-                    adc_data_st.adc_processed_data[ADC_IDX_PRESS_INTAKE], adc_data_st.adc_processed_data[ADC_IDX_PRESS_EXHAUST],
-                    adc_data_st.adc_processed_data[ADC_IDX_CURRENT_1], adc_data_st.adc_processed_data[ADC_IDX_CURRENT_2],
-                    adc_data_st.adc_processed_data[ADC_IDX_CURRENT_3]);
-
             //test the deepest stack used condition
             uxHighWaterMark = uxTaskGetStackHighWaterMark(NULL);
             LOG_INFO("the deepeset is %lu", uxHighWaterMark);
