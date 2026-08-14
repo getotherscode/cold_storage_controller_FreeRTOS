@@ -40,7 +40,7 @@ void MX_IWDG_Init(void)
 
   /* USER CODE END IWDG_Init 1 */
   hiwdg.Instance = IWDG;
-  hiwdg.Init.Prescaler = IWDG_PRESCALER_4;
+  hiwdg.Init.Prescaler = IWDG_PRESCALER_16;
   hiwdg.Init.Window = 4095;
   hiwdg.Init.Reload = 4095;
   if (HAL_IWDG_Init(&hiwdg) != HAL_OK)
@@ -58,10 +58,13 @@ void MX_IWDG_Init(void)
 void iwdg_task(void* pvParameters)
 {
   (void)pvParameters;
+
+  MX_IWDG_Init();
+  
   for (;;)
   {
-      HAL_IWDG_Refresh(&hiwdg);
-      vTaskDelay(pdMS_TO_TICKS(100));
+    HAL_IWDG_Refresh(&hiwdg);
+    vTaskDelay(pdMS_TO_TICKS(100));
   }
 }
 
