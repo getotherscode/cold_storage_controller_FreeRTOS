@@ -29,7 +29,7 @@
 /* USER CODE BEGIN Includes */
 #include "FreeRTOS.h"
 #include "task.h"
-#include "compressor.h"
+#include "relay.h"
 #include "adc_app.h"
 #include "uart_app.h"
 #include "log.h"
@@ -118,7 +118,13 @@ int main(void)
 
   // eep task
   xTaskCreate(eep_test, "EEP MAIN",256, NULL, 1, NULL);
-  
+
+  //iwdg task, feed 100ms
+  xTaskCreate(iwdg_task, "IWDG TASK", 64, NULL, 1, NULL);
+
+  //relay task
+  xTaskCreate(relay_main, "RELAY TASK", 64, NULL, 1, NULL);
+
   vTaskStartScheduler();
   while (1)
   {
