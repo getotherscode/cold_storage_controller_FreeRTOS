@@ -1,6 +1,7 @@
 add_library(lib 
     STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/adc_filter.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/crc.c
 )
 
 target_include_directories(lib
