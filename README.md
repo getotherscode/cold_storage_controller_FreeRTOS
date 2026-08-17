@@ -18,31 +18,31 @@ Refrigeration control system firmware based on STM32 and FreeRTOS, featuring EEV
       |---CMakeLists  
 
 ### software
-1>CMake  
-2>Ninja  
-3>arm-none-ebai-gcc  
+- CMake  
+- Ninja  
+- arm-none-ebai-gcc  
 
 ### cmd
 
 #### debug
-1> cmake --preset Debug  
-2> ninja -C build/Debug  
+- cmake --preset Debug  
+- ninja -C build/Debug  
 
 #### release
-1> cmake --preset Release  
-2> ninja -C build/Release  
+- cmake --preset Release  
+- ninja -C build/Release  
 
 ## FLASH and RAM layout
 
 ### FLASH
-1) bootloader 0x08000000-0x08004FFF size: 20K
-2) main app   0x08005000-0x0801D000 size: 104K
-3) crash log  0x0801E000-0x0801E7FF size: 2K
-4) boot mark  0x0801E800-0x0801EFFF size: 2K
+1. bootloader 0x08000000-0x08004FFF size: 20K
+2. main app   0x08005000-0x0801D000 size: 104K
+3. crash log  0x0801E000-0x0801E7FF size: 2K
+4. boot mark  0x0801E800-0x0801EFFF size: 2K
 
 ### RAM
-1) common ram 0x20000000-0x20008BFF 35K
-2) crash log  0x20000000-0x20009000 1K
+1. common ram 0x20000000-0x20008BFF 35K
+2. crash log  0x20000000-0x20009000 1K
 
 
 ## download and Debug
@@ -61,11 +61,11 @@ openocd -f interface/cmsis-dap.cfg -f target/stm32g0x.cfg\
 ## test
 
 ### unity test
-1> where: https://www.throwtheswitch.org/unity#unity-get-section  
-2> clone: git clone https://github.com/ThrowTheSwitch/Unity.git  
-3> needed files: 1)unity.c 2)unity.h 3) unity_internals.h  
-4> where to put: test/unity  
-5> verify test: in test folder, type "make", execute "test_main.exe"  
+- where: https://www.throwtheswitch.org/unity#unity-get-section  
+- clone: git clone https://github.com/ThrowTheSwitch/Unity.git  
+- needed files: 1)unity.c 2)unity.h 3) unity_internals.h  
+- where to put: test/unity  
+- verify test: in test folder, type "make", execute "test_main.exe"  
 
 ### mock test
 
@@ -84,8 +84,8 @@ arm-none-eabi-objdump -dS your_project.elf > disasm.txt
 any data read and write operation should be executed by database proxy safety functions  
 
 ## usart duties
--usart4: output debug info, sample data, runtime data
--usart2: data read, ota, data write
+- usart4: output debug info, sample data, runtime data
+- usart2: data read, ota, data write
 
 ## references
 
