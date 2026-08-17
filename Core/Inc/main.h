@@ -122,6 +122,11 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN Private defines */
 
+#define BOOTLOADER_ADDR 0x08000000U
+#define BOOTLOADER_SIZE 0x00005000U
+#define SRAM_START_ADDR 0x20000000U
+#define SRAM_SIZE       (35 * 1024)
+
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

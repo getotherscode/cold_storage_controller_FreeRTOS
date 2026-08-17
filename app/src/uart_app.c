@@ -64,11 +64,25 @@ void uart2_recv_tasks(void *pvParameters)
     (void)pvParameters;
     
     while(1)
+bool jump_to_bootloader(void)
+{
+    uint32_t boot_stack_top = *(uint32_t *)(BOOTLOADER_ADDR);
+    if((boot_stack_top < SRAM_START_ADDR) || (boot_stack_top > (SRAM_START_ADDR + SRAM_SIZE)))
     {
-        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-
+        return false;
     }
 
+    uint32_t reset_handler = *(uint32_t *)(BOOTLOADER_ADDR + 4);
+    if((reset_handler < BOOTLOADER_ADDR) || (reset_handler > (BOOTLOADER_ADDR + BOOTLOADER_SIZE)))
+    {
+        return false;
+    }
+
+    SCB->VTOR = BOOTLOADER_ADDR;
+    __set_MSP(boot_stack_top);
+    void(*reset_app)(void) = (void(*)(void))reset_handler;
+    reset_app();
+    while(1);
 }
 
 void uart3_recv_tasks(void *pvParameters)
