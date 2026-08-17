@@ -60,10 +60,14 @@
 extern DMA_HandleTypeDef hdma_adc1;
 extern ADC_HandleTypeDef hadc1;
 extern TIM_HandleTypeDef htim6;
+extern DMA_HandleTypeDef hdma_usart2_rx;
+extern DMA_HandleTypeDef hdma_usart3_rx;
+extern DMA_HandleTypeDef hdma_usart4_rx;
 extern UART_HandleTypeDef huart2;
 extern UART_HandleTypeDef huart3;
 extern UART_HandleTypeDef huart4;
 /* USER CODE BEGIN EV */
+extern TaskHandle_t uart_recv_tasks_handler_t;
 
 /* USER CODE END EV */
 
@@ -98,8 +102,8 @@ void HardFault_Handler(void)
   while (1)
   {
     /* USER CODE BEGIN W1_HardFault_IRQn 0 */
-    //LR bit2 = 0  → use MSP before abnormal: main stack point
-    //LR bit2 = 1  → use PSP before abnormal: process stack point
+    //LR bit2 = 0  : use MSP before abnormal: main stack point
+    //LR bit2 = 1  : use PSP before abnormal: process stack point
     //LR & 4, check if lr bit2 is 1/0
     //bl brach with link, beq: branch if equal, brach = jump
     //mrs move from special register
@@ -110,10 +114,10 @@ void HardFault_Handler(void)
         "tst    r1, r2             \n"
         "beq    use_msp            \n"
         "mrs    r0, psp            \n"
-        "bl     hardfault_hander_c \n"   // b → bl
+        "bl     hardfault_hander_c \n"   // b - bl
         "use_msp:                  \n"
         "mrs    r0, msp            \n"
-        "bl     hardfault_hander_c \n"   // b → bl
+        "bl     hardfault_hander_c \n"   // b - bl
     );
     /* USER CODE END W1_HardFault_IRQn 0 */
   }
@@ -139,6 +143,35 @@ void DMA1_Channel1_IRQHandler(void)
   /* USER CODE BEGIN DMA1_Channel1_IRQn 1 */
 
   /* USER CODE END DMA1_Channel1_IRQn 1 */
+}
+
+/**
+  * @brief This function handles DMA1 channel 2 and channel 3 interrupts.
+  */
+void DMA1_Channel2_3_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA1_Channel2_3_IRQn 0 */
+
+  /* USER CODE END DMA1_Channel2_3_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_usart2_rx);
+  HAL_DMA_IRQHandler(&hdma_usart4_rx);
+  /* USER CODE BEGIN DMA1_Channel2_3_IRQn 1 */
+
+  /* USER CODE END DMA1_Channel2_3_IRQn 1 */
+}
+
+/**
+  * @brief This function handles DMA1 channel 4, channel 5, channel 6, channel 7 and DMAMUX1 interrupts.
+  */
+void DMA1_Ch4_7_DMAMUX1_OVR_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA1_Ch4_7_DMAMUX1_OVR_IRQn 0 */
+
+  /* USER CODE END DMA1_Ch4_7_DMAMUX1_OVR_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_usart3_rx);
+  /* USER CODE BEGIN DMA1_Ch4_7_DMAMUX1_OVR_IRQn 1 */
+
+  /* USER CODE END DMA1_Ch4_7_DMAMUX1_OVR_IRQn 1 */
 }
 
 /**
@@ -177,9 +210,14 @@ void USART2_IRQHandler(void)
   /* USER CODE BEGIN USART2_IRQn 0 */
     if (__HAL_UART_GET_FLAG(&huart2, UART_FLAG_IDLE)) 
     {
-        __HAL_UART_CLEAR_IDLEFLAG(&huart2);
+      __HAL_UART_CLEAR_IDLEFLAG(&huart2);
 
-        uart_idel_it_callback(&huart2);
+      volatile uint16_t len = huart2.RxXferSize - huart2.RxXferCount;
+      set_uart2_recv_len(len);
+
+      BaseType_t woken = pdFALSE;
+      xTaskNotifyFromISR(uart_recv_tasks_handler_t, UART2_EVENT, eSetBits, &woken);
+      portYIELD_FROM_ISR(woken);
     }
   /* USER CODE END USART2_IRQn 0 */
   HAL_UART_IRQHandler(&huart2);
@@ -196,16 +234,26 @@ void USART3_4_IRQHandler(void)
   /* USER CODE BEGIN USART3_4_IRQn 0 */
     if (__HAL_UART_GET_FLAG(&huart3, UART_FLAG_IDLE)) 
     {
-        __HAL_UART_CLEAR_IDLEFLAG(&huart3);
-        
-        uart_idel_it_callback(&huart3);
+      __HAL_UART_CLEAR_IDLEFLAG(&huart3);
+      
+      volatile uint16_t len = huart3.RxXferSize - huart3.RxXferCount;
+      set_uart3_recv_len(len);
+
+      BaseType_t woken = pdFALSE;
+      xTaskNotifyFromISR(uart_recv_tasks_handler_t, UART3_EVENT, eSetBits, &woken);
+      portYIELD_FROM_ISR(woken);
     }
 
     if (__HAL_UART_GET_FLAG(&huart4, UART_FLAG_IDLE)) 
     {
-        __HAL_UART_CLEAR_IDLEFLAG(&huart4);
-        
-        uart_idel_it_callback(&huart4);
+      __HAL_UART_CLEAR_IDLEFLAG(&huart4);
+      
+      volatile uint16_t len = huart4.RxXferSize - huart4.RxXferCount;
+      set_uart4_recv_len(len);
+
+      BaseType_t woken = pdFALSE;
+      xTaskNotifyFromISR(uart_recv_tasks_handler_t, UART4_EVENT, eSetBits, &woken);
+      portYIELD_FROM_ISR(woken);
     }
 
   /* USER CODE END USART3_4_IRQn 0 */

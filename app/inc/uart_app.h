@@ -12,6 +12,14 @@
 #define UART_RECV_BYTES 1024
 #define UART_SEND_BYTES 1024
 
+#define UART2_EVENT  (1 << 0)
+#define UART3_EVENT  (1 << 1)
+#define UART4_EVENT  (1 << 2)
+
+#define UART2_DEVICE_ID 9
+
+#define MESSAGE_MIN_LEN 6
+
 typedef struct
 {
     TaskHandle_t uart_task;
@@ -27,27 +35,26 @@ typedef struct
 
 typedef enum 
 {
-    RIGHT = 2,
-    DISPLAY = 3,
-    LEFT = 4,
+    RIGHT_2   = 2,
+    DISPLAY_3 = 3,
+    LEFT_4    = 4,
 } UART_ID;
+
+typedef enum
+{
+    UART2_CMD_OTA = 1
+}UART2_Cmd_Type;
 
 TaskHandle_t* get_uart_task_handle_ptr(uint8_t uart_idth);
 
-void uart_idel_it_callback(UART_HandleTypeDef *huart);
-
-static inline void SET_UART4_TX(void)
-{ HAL_GPIO_WritePin(UART4_485_LEFT_DIR_GPIO_Port, UART4_485_LEFT_DIR_Pin, GPIO_PIN_SET);}
-
-static inline void SET_UART4_RX(void)
-{ HAL_GPIO_WritePin(UART4_485_LEFT_DIR_GPIO_Port, UART4_485_LEFT_DIR_Pin, GPIO_PIN_RESET);}
-
 void uart4_send(uint8_t* buffer, uint16_t len);
 
-void uart2_recv_tasks(void *pvParameters);
+void set_uart2_recv_len(volatile uint16_t len);
 
-void uart3_recv_tasks(void *pvParameters);
+void set_uart3_recv_len(volatile uint16_t len);
 
-void uart4_recv_tasks(void *pvParameters);
+void set_uart4_recv_len(volatile uint16_t len);
 
 void uart_init(void);
+
+void uart_recv_tasks(void *pvParameters);

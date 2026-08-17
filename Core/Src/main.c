@@ -55,6 +55,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+extern TaskHandle_t uart_recv_tasks_handler_t;
 
 /* USER CODE END PV */
 
@@ -124,6 +125,9 @@ int main(void)
 
   //relay task
   xTaskCreate(relay_main, "RELAY TASK", 64, NULL, 1, NULL);
+
+  //usart receive tasks
+  xTaskCreate(uart_recv_tasks, "USART RECEIVE TASKS", 256, NULL, 5, &uart_recv_tasks_handler_t);
 
   vTaskStartScheduler();
   while (1)
