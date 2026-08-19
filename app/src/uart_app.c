@@ -96,8 +96,9 @@ bool jump_to_bootloader(void)
 
     __disable_irq();
     SCB->VTOR = BOOTLOADER_ADDR;
-	__DSB(); //Data Synchronization Barrier
-	__ISB(); //Instruction Synchronization Barrier
+    TAMP->BKP0R = OTA_REQUEST_MAGIC; //main jump to bootloader mark
+	__DSB();                         //Data Synchronization Barrier
+	__ISB();                         //Instruction Synchronization Barrier
     __set_MSP(boot_stack_top);
     void(*reset_app)(void) = (void(*)(void))reset_handler;
     reset_app();
