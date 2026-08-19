@@ -81,19 +81,23 @@ void reset_uart4_recv(void)
 
 bool jump_to_bootloader(void)
 {
-    uint32_t boot_stack_top = *(uint32_t *)(BOOTLOADER_ADDR);
+    uint32_t boot_stack_top = *(volatile uint32_t *)(BOOTLOADER_ADDR);
     if((boot_stack_top < SRAM_START_ADDR) || (boot_stack_top > (SRAM_START_ADDR + SRAM_SIZE)))
     {
         return false;
     }
 
-    uint32_t reset_handler = *(uint32_t *)(BOOTLOADER_ADDR + 4);
-    if((reset_handler < BOOTLOADER_ADDR) || (reset_handler > (BOOTLOADER_ADDR + BOOTLOADER_SIZE)))
+    uint32_t reset_handler = *(volatile uint32_t *)(BOOTLOADER_ADDR + 4);
+    uint32_t reset_addr = reset_handler & ~1UL;
+    if((reset_addr < BOOTLOADER_ADDR) || (reset_addr >= (BOOTLOADER_ADDR + BOOTLOADER_SIZE)))
     {
         return false;
     }
 
+    __disable_irq();
     SCB->VTOR = BOOTLOADER_ADDR;
+	__DSB(); //Data Synchronization Barrier
+	__ISB(); //Instruction Synchronization Barrier
     __set_MSP(boot_stack_top);
     void(*reset_app)(void) = (void(*)(void))reset_handler;
     reset_app();
