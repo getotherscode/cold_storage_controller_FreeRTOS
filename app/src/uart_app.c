@@ -79,6 +79,8 @@ void reset_uart4_recv(void)
     HAL_UARTEx_ReceiveToIdle_DMA(&huart4, uart4_rx_st.recv_buffer, UART_RECV_BYTES);
 }
 
+/* plan A, the question is jump to bootloader usart irq is not work*/
+/*
 bool jump_to_bootloader(void)
 {
     uint32_t boot_stack_top = *(volatile uint32_t *)(BOOTLOADER_ADDR);
@@ -95,14 +97,54 @@ bool jump_to_bootloader(void)
     }
 
     __disable_irq();
-    SCB->VTOR = BOOTLOADER_ADDR;
+
+    // prepare for TAMP->BKP0R writing
+    __HAL_RCC_PWR_CLK_ENABLE();
+    __HAL_RCC_RTCAPB_CLK_ENABLE();
+
+    HAL_PWR_EnableBkUpAccess();
     TAMP->BKP0R = OTA_REQUEST_MAGIC; //main jump to bootloader mark
-	__DSB();                         //Data Synchronization Barrier
-	__ISB();                         //Instruction Synchronization Barrier
+    HAL_PWR_DisableBkUpAccess();
+
+    SCB->VTOR = BOOTLOADER_ADDR;
+	__DSB();
+	__ISB();
     __set_MSP(boot_stack_top);
     void(*reset_app)(void) = (void(*)(void))reset_handler;
     reset_app();
     while(1);
+}
+*/
+
+/* plan B, use  NVIC_SystemReset clear all execute record */
+void jump_to_bootloader(void)
+{
+    uint32_t boot_stack_top = *(volatile uint32_t *)(BOOTLOADER_ADDR);
+    if((boot_stack_top < SRAM_START_ADDR) || (boot_stack_top > (SRAM_START_ADDR + SRAM_SIZE)))
+    {
+        return;
+    }
+
+    uint32_t reset_handler = *(volatile uint32_t *)(BOOTLOADER_ADDR + 4);
+    uint32_t reset_addr = reset_handler & ~1UL;
+    if((reset_addr < BOOTLOADER_ADDR) || (reset_addr >= (BOOTLOADER_ADDR + BOOTLOADER_SIZE)))
+    {
+        return;
+    }
+
+    // prepare for TAMP->BKP0R writing
+    __HAL_RCC_PWR_CLK_ENABLE();
+    __HAL_RCC_RTCAPB_CLK_ENABLE();
+
+    HAL_PWR_EnableBkUpAccess();
+
+    TAMP->BKP0R = OTA_REQUEST_MAGIC;
+
+    HAL_PWR_DisableBkUpAccess();
+
+    NVIC_SystemReset();
+
+    while (1);
 }
 
 void uart2_recv_tasks(void)

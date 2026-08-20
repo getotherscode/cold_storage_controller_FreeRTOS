@@ -126,7 +126,7 @@ void Error_Handler(void);
 #define BOOTLOADER_SIZE   0x00005000U
 #define SRAM_START_ADDR   0x20000000U
 #define SRAM_SIZE         (35 * 1024)
-#define OTA_REQUEST_MAGIC 0x87654321
+#define OTA_REQUEST_MAGIC 0x87654321U
 
 /* USER CODE END Private defines */
 
